@@ -94,7 +94,7 @@ export default {
 </script>
 <template>
   <v-app>
-    <v-container fluid="true">
+    <v-container fluid="true" class="pa-1">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
       <v-row no-gutters>
@@ -105,13 +105,13 @@ export default {
             </v-col>
             <v-col cols="12" lg="6" class="pt-4">
                 <v-row>
-                  <v-col cols="6" sm="12" class="py-0">
+                  <v-col cols="12" sm="6" class="py-0">
                     <v-text-field label="Course (Ex: CSCE)" v-model="course" maxlength="4" @click="setupCourseElem"></v-text-field>
                   </v-col>
-                  <v-col cols="6" sm="12" class="py-0">
+                  <v-col cols="12" sm="6" class="py-0">
                     <v-text-field label="Course Number (Ex: 111)" v-model="courseNumber" @click="setupCourseNumber"></v-text-field>
                   </v-col>
-                  <v-col cols="6" sm="12" class="py-0">
+                  <v-col cols="12" sm="6" class="py-0">
                     <v-select
                         label="Sort By:"
                         v-model="sortByValue"
@@ -119,8 +119,8 @@ export default {
                         @change="setupSortBy"
                     ></v-select>
                   </v-col>
-                  <v-col cols="6" sm="12" class="py-0">
-                    <v-btn color="black" @click="onSubmitButtonClick">Submit</v-btn>
+                  <v-col cols="12" sm="6" align-self="start">
+                    <v-btn color="black" block="true" @click="onSubmitButtonClick">Submit</v-btn>
                   </v-col>
                 </v-row>
             </v-col>
@@ -136,7 +136,7 @@ export default {
         <v-col cols="12" class="px-4 py-4">
           <p class="text-center"> I want this to be helpful to all students. </p>
           <p class="text-center">An education is the best indicator of success, but you don't have to be dumb going about getting one.</p>
-          <p class="text-center"> I will keep updating the course data as long as I can.</p>
+          <p class="text-center mb-4"> I will keep updating the course data as long as I can.</p>
           <ul class="text-center">
             <li><a href="https://github.com/jippylong12/TAMU_FGD_FRONT_END"> Front-end Code</a></li>
             <li><a href="https://github.com/jippylong12/TAMU_FGD">Server Code</a></li>
