@@ -1,5 +1,7 @@
 <script>
 import { ref } from 'vue'
+import axios from 'axios';
+
 export default {
   setup() {
     const course = ref('')
@@ -16,6 +18,26 @@ export default {
     window.addEventListener('DOMContentLoaded', function () {
       addSearchParams()
     })
+
+    const makePostRequest = async () => {
+      const formData = {
+        course: course.value,
+        course_number: courseNumber.value,
+        sort_by: sortByValue.value['value'],
+      }
+      const url = 'results.php'
+      const response = await axios.post(url, formData);
+
+      if (response.status === 200) {
+        // The request was successful
+        const data = response.data;
+        console.log(data.headers);
+        console.log(data.results);
+      } else {
+        // The request failed
+        console.log(response.error);
+      }
+    };
 
     function addSearchParams() {
       const searchParams = new URLSearchParams(window.location.search);
@@ -49,6 +71,7 @@ export default {
         course_number: courseNumber.value,
         sort_by: sortByValue.value['title'],
       });
+      makePostRequest()
     }
 
     // expose the ref to the template
@@ -93,7 +116,7 @@ export default {
                     ></v-select>
                   </v-col>
                   <v-col cols="6" sm="12" class="">
-                    <v-btn color="black">Submit</v-btn>
+                    <v-btn color="black" @click="onSubmitButtonClick">Submit</v-btn>
                   </v-col>
                 </v-row>
             </v-col>
