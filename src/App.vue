@@ -586,7 +586,7 @@ export default {
       </v-row>
       <v-row v-if="tableData.length > 0" class="px-4 mb-4">
         <v-col cols="12">
-          <DataTable :value="tableData" tableStyle="min-width: 50rem">
+          <DataTable :value="tableData" paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem">
             <Column v-for="header of tableHeaders" :field="header" :header="header"></Column>
           </DataTable>
         </v-col>

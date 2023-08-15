@@ -8,16 +8,16 @@
 }
 
 table, th, td {
-    border: 2px solid dimgray;
-    border-collapse: collapse;
+    border: 2px solid dimgray !important;
+    border-collapse: collapse !important;;
 }
 
 table {
-    table-layout: auto;
+    table-layout: auto !important;;
 }
 
 tr {
-    text-align: center;
+    text-align: center !important;;
     border-color: maroon !important;
 }
 
@@ -31,14 +31,14 @@ ul {list-style: none; margin: 0;
 
 th {
     padding: 12px !important;
-    font-size: large;
+    font-size: large  !important;;
     background-color: maroon !important;
-    color: white;
+    color: white !important;;
 }
 
 td {
     padding: 20px !important;
-    text-align: center;
+    text-align: center !important;;
     background-color: whitesmoke !important;
     border-color: whitesmoke !important;
 }
@@ -104,6 +104,9 @@ h5 {
     100% {
         background-position: 12.5rem top; /*200px*/
     }
+}
+.p-paginator {
+    background-color: lightgray !important;
 }
 
 .copy-url-button {

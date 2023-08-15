@@ -11,6 +11,9 @@ import * as directives from 'vuetify/directives'
 import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
+import Paginator from "primevue/paginator";
+import "primevue/resources/themes/lara-light-indigo/theme.css";
+
 
 const vuetify = createVuetify({
     components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn},
@@ -20,4 +23,5 @@ const vuetify = createVuetify({
 const app = createApp(App).use(vuetify).use(PrimeVue)
 app.component('DataTable', DataTable);
 app.component('Column', Column);
+app.component('Paginator', Paginator);
 app.mount('#app')
