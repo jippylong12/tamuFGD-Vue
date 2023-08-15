@@ -61,19 +61,17 @@ export default {
 }
 </script>
 <template>
-
   <v-app>
     <v-container fluid="true">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
-      <div class="row">
-
-        <div class="col-12 d-flex justify-content-center mt-2 mt-sm-0 px-4">
-          <div class="row">
-            <div class="col-12">
+      <v-row>
+        <v-col cols="12" class="mt-2 mt-sm-0 px-4">
+          <v-row justify="center">
+            <v-col cols="12">
               <p class="text-center fs-5">Enter the course information below and press submit. Golden rows are Honors only.</p>
-            </div>
-            <div class="col-12 col-lg-6 offset-lg-3">
+            </v-col>
+            <v-col cols="12" lg="6" offset-lg="3">
               <form action="results.php" method="post" id="myForm">
 
                 <div class="row">
@@ -105,9 +103,9 @@ export default {
                 </div>
 
               </form>
-            </div>
-          </div>
-        </div>
+            </v-col>
+          </v-row>
+        </v-col>
 
         <div class="col-12 mb-2">
           <h5 class="suggestion"> Data from Spring 2012 - Fall 2022</h5>
@@ -128,7 +126,7 @@ export default {
         <div class="col-12">
           <p style="text-align: center"><b>I'm glad this website is helping people. </b> </p>
         </div>
-      </div>
+      </v-row>
 
       <br>
       <div>
