@@ -8,6 +8,8 @@ export default {
     const courseNumber = ref('')
     const sortByOptions = [{value: '1', title: 'GPA'}, {value: '2', title: 'Professor Last Name'}];
     const sortByValue = ref({value: '1', title: 'GPA'});
+    const tableData = ref({});
+    const tableHeaders = ref([])
 
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
@@ -31,8 +33,10 @@ export default {
       if (response.status === 200) {
         // The request was successful
         const data = response.data;
-        console.log(data.headers);
-        console.log(data.results);
+        if(data.success){
+          tableHeaders.value = data.headers;
+          tableData.value = data.results;
+        }
       } else {
         // The request failed
         console.log(response.error);
