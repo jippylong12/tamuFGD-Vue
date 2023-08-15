@@ -1,8 +1,12 @@
 <script>
+import { ref } from 'vue'
 export default {
+  setup() {
+    const course = ref('')
+    const courseNumber = ref('')
+    const sortByOptions = [{value: '1', title: 'GPA'}, {value: '2', title: 'Professor Last Name'}];
+    const sortByValue = ref({value: '1', title: 'GPA'});
 
-
-  mounted() {
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
@@ -10,54 +14,55 @@ export default {
     gtag('config', 'G-B24WEF5K6V');
 
     window.addEventListener('DOMContentLoaded', function () {
-      setupGtag();
       addSearchParams()
     })
 
     function addSearchParams() {
       const searchParams = new URLSearchParams(window.location.search);
-
-      const courseInput = document.getElementById("course");
-      const courseNumberInput = document.getElementById("course_number");
       const sortByInput = document.getElementById("sort_by");
-      const submitBtn = document.getElementById("submit_btn");
 
-      courseInput.value = searchParams.get("course");
-      courseNumberInput.value = searchParams.get("number");
+      course.value = searchParams.get("course");
+      courseNumber.value = searchParams.get("number");
       if(searchParams.get("sort_by")){
         sortByInput.value = searchParams.get("sort_by")
       }
 
-      if (searchParams.get("course") && searchParams.get("number")) {
-        submitBtn.click();
+      if (course.value && courseNumber.value) {
+        onSubmitButtonClick();
       }}
 
-    function setupGtag() {
-      let courseElem = document.getElementById('course');
-      let courseNumberElem = document.getElementById('course_number');
-      let sortByElem = document.getElementById('sort_by');
-      let submitBtnElem = document.getElementById('submit_btn');
-      courseElem.onclick = function () {
-        gtag('event', 'clicked_course');
-      }
-
-      courseNumberElem.onclick = function () {
-        gtag('event', 'clicked_course_number');
-      }
-
-      sortByElem.onclick = function () {
-        gtag('event', 'clicked_sort_by');
-      }
-
-      submitBtnElem.onclick = function () {
-        gtag('event', 'clicked_submit_btn', {
-          course: courseElem.value,
-          course_number: courseNumberElem.value,
-          sort_by: sortByElem.value,
-        });
-      }
+    function setupCourseElem() {
+      gtag('event', 'clicked_course');
     }
-  }
+
+    function setupCourseNumber() {
+      gtag('event', 'clicked_course_number');
+    }
+
+    function setupSortBy() {
+      gtag('event', 'clicked_sort_by');
+    }
+
+    function onSubmitButtonClick() {
+      gtag('event', 'clicked_submit_btn', {
+        course: course.value,
+        course_number: courseNumber.value,
+        sort_by: sortByValue.value['title'],
+      });
+    }
+
+    // expose the ref to the template
+    return {
+      course,
+      courseNumber,
+      sortByOptions,
+      sortByValue,
+      setupCourseElem,
+      setupCourseNumber,
+      setupSortBy,
+      onSubmitButtonClick,
+    }
+  },
 }
 </script>
 <template>
@@ -66,43 +71,31 @@ export default {
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
       <v-row>
-        <v-col cols="12" class="mt-2 mt-sm-0 px-4">
+        <v-col cols="12" class="mt-2 px-4">
           <v-row justify="center">
             <v-col cols="12">
-              <p class="text-center fs-5">Enter the course information below and press submit. Golden rows are Honors only.</p>
+              <p class="text-center text-h6">Enter the course information below and press submit. Golden rows are Honors only.</p>
             </v-col>
-            <v-col cols="12" lg="6" offset-lg="3">
-              <form action="results.php" method="post" id="myForm">
-
-                <div class="row">
-                  <div class="col-12 col-sm-6">
-                    <div class="form-floating mb-3">
-                      <input name="course" id="course" value="" type="text" class="form-control" form="myForm" maxlength="4"/>
-                      <label class="inputText">Course (Ex: CSCE)</label>
-                    </div>
-                  </div>
-                  <div class="col-12 col-sm-6">
-                    <div class="form-floating mb-3">
-                      <input name="course_number" id="course_number" value="" type="tel" class="form-control" form="myForm"/>
-                      <label class="inputText">Course Number (Ex: 111)</label>
-                    </div>
-                  </div>
-                  <div class="col-12 col-sm-6">
-                    <div class="form-floating mb-3">
-                      <select name="sort_by" id="sort_by" class="form-select" form="myForm">
-                        <option value="1">GPA</option>
-                        <option value="2">Professor Last Name</option>
-                      </select>
-                      <label class="inputText">Sort By: </label>
-                    </div>
-
-                  </div>
-                  <div class="col-12 col-sm-6 mt-sm-2">
-                    <input type="submit" name="submit_btn" id="submit_btn" value="Submit" class="btn btn-dark form-control" />
-                  </div>
-                </div>
-
-              </form>
+            <v-col cols="12" lg="6">
+                <v-row>
+                  <v-col cols="6" sm="12" class="pt-0 pb-0">
+                    <v-text-field label="Course (Ex: CSCE)" v-model="course" maxlength="4" @click="setupCourseElem"></v-text-field>
+                  </v-col>
+                  <v-col cols="6" sm="12" class="pt-0">
+                    <v-text-field label="Course Number (Ex: 111)" v-model="courseNumber" @click="setupCourseNumber"></v-text-field>
+                  </v-col>
+                  <v-col cols="6" sm="12" class="py-0">
+                    <v-select
+                        label="Sort By:"
+                        v-model="sortByValue"
+                        :items="sortByOptions"
+                        @change="setupSortBy"
+                    ></v-select>
+                  </v-col>
+                  <v-col cols="6" sm="12" class="">
+                    <v-btn color="black">Submit</v-btn>
+                  </v-col>
+                </v-row>
             </v-col>
           </v-row>
         </v-col>
