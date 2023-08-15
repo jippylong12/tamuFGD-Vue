@@ -6,12 +6,18 @@ import App from './App.vue'
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
-import * as components from 'vuetify/components'
+import {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn} from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import PrimeVue from 'primevue/config';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
 
 const vuetify = createVuetify({
-    components,
+    components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn},
     directives,
 })
 
-createApp(App).use(vuetify).mount('#app')
+const app = createApp(App).use(vuetify).use(PrimeVue)
+app.component('DataTable', DataTable);
+app.component('Column', Column);
+app.mount('#app')
