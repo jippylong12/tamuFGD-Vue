@@ -97,18 +97,18 @@ export default {
     <v-container fluid="true">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
-      <v-row>
+      <v-row no-gutters>
         <v-col cols="12" class="mt-2 px-4">
-          <v-row justify="center">
+          <v-row justify="center" no-gutters>
             <v-col cols="12">
               <p class="text-center text-h6">Enter the course information below and press submit. Golden rows are Honors only.</p>
             </v-col>
-            <v-col cols="12" lg="6">
+            <v-col cols="12" lg="6" class="pt-4">
                 <v-row>
-                  <v-col cols="6" sm="12" class="pt-0 pb-0">
+                  <v-col cols="6" sm="12" class="py-0">
                     <v-text-field label="Course (Ex: CSCE)" v-model="course" maxlength="4" @click="setupCourseElem"></v-text-field>
                   </v-col>
-                  <v-col cols="6" sm="12" class="pt-0">
+                  <v-col cols="6" sm="12" class="py-0">
                     <v-text-field label="Course Number (Ex: 111)" v-model="courseNumber" @click="setupCourseNumber"></v-text-field>
                   </v-col>
                   <v-col cols="6" sm="12" class="py-0">
@@ -119,7 +119,7 @@ export default {
                         @change="setupSortBy"
                     ></v-select>
                   </v-col>
-                  <v-col cols="6" sm="12" class="">
+                  <v-col cols="6" sm="12" class="py-0">
                     <v-btn color="black" @click="onSubmitButtonClick">Submit</v-btn>
                   </v-col>
                 </v-row>
@@ -127,13 +127,13 @@ export default {
           </v-row>
         </v-col>
 
-        <div class="col-12 mb-2">
+        <v-col cols="12" class="py-2">
           <h5 class="suggestion"> Data from Spring 2012 - Fall 2022</h5>
           <h5 class="suggestion"> <a href="mailto: jippylong12@gmail.com">Email</a> for suggestions</h5>
           <h5 class="suggestion"><a href="http://www.jippylong12.xyz">Me</a></h5>
-        </div>
+        </v-col>
 
-        <div class="col-12 px-4">
+        <v-col cols="12" class="px-4 py-4">
           <p class="text-center"> I want this to be helpful to all students. </p>
           <p class="text-center">An education is the best indicator of success, but you don't have to be dumb going about getting one.</p>
           <p class="text-center"> I will keep updating the course data as long as I can.</p>
@@ -142,22 +142,24 @@ export default {
             <li><a href="https://github.com/jippylong12/TAMU_FGD">Server Code</a></li>
             <li><a href="https://drive.google.com/drive/folders/0B6WlnfAGiKk9ZlEwcElEZW9rUE0?resourcekey=0-bkINHRtazSza6dDL8MIyIg&usp=sharing"> CSV DB Files</a></li>
           </ul>
-        </div>
-        <div class="col-12">
+        </v-col>
+
+        <v-col cols="12" class="py-2">
           <p style="text-align: center"><b>I'm glad this website is helping people. </b> </p>
-        </div>
+        </v-col>
       </v-row>
 
-      <br>
-      <div>
-        <h5 class="suggestion"> Thanks & Acknowledgements</h5>
-        <h5 class="credits">
-          <b>My Momma: #1</b><br>
-          <b>Matthew:</b> adding the Q drop column.<br>
-          <b>Zubin:</b> Pointing out the averaging problem.<br>
-          <b>Eric:</b> Suggesting to distinguish honors sections.
-        </h5>
-      </div>
+      <v-row no-gutters>
+        <v-col cols="12">
+          <h5 class="suggestion"> Thanks & Acknowledgements</h5>
+          <h5 class="credits">
+            <b>My Momma: #1</b><br>
+            <b>Matthew:</b> adding the Q drop column.<br>
+            <b>Zubin:</b> Pointing out the averaging problem.<br>
+            <b>Eric:</b> Suggesting to distinguish honors sections.
+          </h5>
+        </v-col>
+      </v-row>
     </v-container>
   </v-app>
 
