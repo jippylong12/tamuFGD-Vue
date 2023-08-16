@@ -7,9 +7,9 @@
     width: 100%
 }
 
-table, th, td {
-    border: 2px solid dimgray !important;
-    border-collapse: collapse !important;;
+th, td {
+    border: 2px solid dimgray;
+    border-collapse: collapse !important;
 }
 
 table {
@@ -24,6 +24,7 @@ tr {
 .honors {
     background-color: #998542 !important;
     border-color: #998542 !important;
+    color: white !important;
 }
 
 ul {list-style: none; margin: 0;
@@ -33,14 +34,14 @@ th {
     padding: 12px !important;
     font-size: large  !important;;
     background-color: maroon !important;
-    color: white !important;;
+    color: white !important;
+    border-color: transparent !important;
 }
 
 td {
     padding: 20px !important;
-    text-align: center !important;;
-    background-color: whitesmoke !important;
-    border-color: whitesmoke !important;
+    text-align: center !important;
+    border-color: transparent !important;
 }
 
 h1.title {
