@@ -375,7 +375,7 @@ export default {
 
       <v-row no-gutters v-if="tableData.length === 0">
         <v-col cols="12" class="py-2">
-          <h5 class="suggestion"> Data from Spring 2012 - Fall 2022</h5>
+          <h5 class="suggestion"> Data from Spring 2012 - Spring 2023</h5>
           <h5 class="suggestion"> <a href="mailto: jippylong12@gmail.com">Email</a> for suggestions</h5>
           <h5 class="suggestion"><a href="http://www.jippylong12.xyz">Me</a></h5>
         </v-col>
@@ -404,13 +404,12 @@ export default {
           </h5>
         </v-col>
       </v-row>
-      <v-row v-if="tableData.length > 0" class="px-4 mb-4">
+      <v-row v-if="tableData.length > 0 || dataLoading" class="px-4 mb-4">
         <v-col cols="12">
           <DataTable :loading="dataLoading" :rowClass="determineRowClass" :value="tableData"
                      paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem"
                      filterDisplay="row"  v-model:filters="filters" :globalFilterFields="['Professor']">
             <template #empty> No records found. </template>
-            <template #loading> Loading data. Please wait. </template>
             <Column sortable="true" v-for="header of tableHeaders" :field="header" :header="header"  :showFilterMenu="false" :style="header === 'Professor' ? 'min-width: 14rem' : ''">
               <template v-if="header === 'Professor'"  #body="{ field, data }">
                 <div :class="data['honors'] === true ? 'shimmer' : null">
