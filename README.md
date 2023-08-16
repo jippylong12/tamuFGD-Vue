@@ -1,7 +1,7 @@
 # Ideas for improvement
-* Complete Vue transition. Make UI parity
+* ~~Complete Vue transition. Make UI parity~~
+* ~~Make same Params load feature~~
 * Make same share feature
-* Make same Params load feature
 * Filter table
 * Sort Table
 * Move from CSV to DB with python script ORM manager
