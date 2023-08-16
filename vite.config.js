@@ -15,7 +15,7 @@ export default defineConfig({
     }
   },
   build: {
-    minify: true,
+    minify: false,
     rollupOptions: {
       output: {
         entryFileNames: `assets/[name].js`,

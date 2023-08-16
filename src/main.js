@@ -15,6 +15,8 @@ import Paginator from "primevue/paginator";
 import "primevue/resources/themes/lara-light-indigo/theme.css";
 
 
+export const DEBUG_FLAG = true;
+
 const vuetify = createVuetify({
     components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn},
     directives,
