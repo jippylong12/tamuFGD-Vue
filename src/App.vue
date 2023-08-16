@@ -594,7 +594,13 @@ export default {
       <v-row v-if="tableData.length > 0" class="px-4 mb-4">
         <v-col cols="12">
           <DataTable :rowClass="determineRowClass" :value="tableData" paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem">
-            <Column v-for="header of tableHeaders" :field="header" :header="header"></Column>
+            <Column v-for="header of tableHeaders" :field="header" :header="header">
+              <template v-if="header === 'Professor'"  #body="{ field, data }">
+                <div :class="data['honors'] === true ? 'shimmer' : null">
+                  {{ data[field] }}
+                </div>
+              </template>
+            </Column>
           </DataTable>
         </v-col>
       </v-row>
