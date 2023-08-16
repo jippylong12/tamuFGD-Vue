@@ -38,6 +38,11 @@ th {
     border-color: transparent !important;
 }
 
+.p-column-header-content {
+    justify-content: center;
+    display: flex;
+}
+
 td {
     padding: 20px !important;
     text-align: center !important;
