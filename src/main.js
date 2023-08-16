@@ -16,7 +16,7 @@ import "primevue/resources/themes/lara-light-indigo/theme.css";
 import "toastify-js/src/toastify.css"
 
 
-export const DEBUG_FLAG = false;
+export const DEBUG_FLAG = true;
 
 const vuetify = createVuetify({
     components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn},

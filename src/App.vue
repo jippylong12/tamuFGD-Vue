@@ -198,7 +198,6 @@ export default {
         if(data.success){
           tableHeaders.value = data.headers;
           tableData.value = data.results;
-          console.log(data.results);
         }
       } else {
         // The request failed
@@ -208,12 +207,14 @@ export default {
 
     function addSearchParams() {
       const searchParams = new URLSearchParams(window.location.search);
-      const sortByInput = document.getElementById("sort_by");
-
       course.value = searchParams.get("course");
       courseNumber.value = searchParams.get("number");
-      if(searchParams.get("sort_by")){
-        sortByInput.value = searchParams.get("sort_by")
+      let sortByParamValue = searchParams.get("sort_by")
+      if(sortByParamValue){
+        let sortVal = sortByOptions.find((a) => a.value === sortByParamValue)
+        if(sortVal){
+          sortByValue.value = sortVal
+        }
       }
 
       if (course.value && courseNumber.value) {
