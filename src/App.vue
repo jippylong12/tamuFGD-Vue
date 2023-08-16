@@ -268,7 +268,7 @@ export default {
         }
 
         return currentMax;
-      }, results[0]);
+      }, results[0]) || {};
 
       lowestGPA.value = results.reduce((currentMax, student) => {
         const currentGPA = student.GPA;
@@ -277,7 +277,7 @@ export default {
         }
 
         return currentMax;
-      }, results[0]);
+      }, results[0]) || {};
 
       const averageGPA = results
           .map((professor) => parseFloat(professor.GPA))
@@ -411,7 +411,7 @@ export default {
         </v-col>
       </v-row>
 
-      <v-row no-gutters v-if="tableData.length === 0">
+      <v-row no-gutters v-if="tableData.length === 0 && !dataLoading">
         <v-col cols="12" class="py-2">
           <h5 class="suggestion"> Data from Spring 2012 - Spring 2023</h5>
           <h5 class="suggestion"> <a href="mailto: jippylong12@gmail.com">Email</a> for suggestions</h5>
