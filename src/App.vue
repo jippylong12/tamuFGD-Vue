@@ -13,7 +13,7 @@ export default {
 
     let tableData = ref([]);
     let tableHeaders = ref([]);
-
+    let dataLoading = ref(false);
     if(DEBUG_FLAG) {
       tableData.value = [
         [
@@ -203,6 +203,8 @@ export default {
         // The request failed
         console.log(response.error);
       }
+
+      dataLoading.value = false;
     };
 
     function addSearchParams() {
@@ -254,6 +256,8 @@ export default {
     }
 
     function onSubmitButtonClick() {
+      dataLoading.value = true;
+
       gtag('event', 'clicked_submit_btn', {
         course: course.value,
         course_number: courseNumber.value,
@@ -261,6 +265,20 @@ export default {
       });
       makePostRequest().then((response) => {
         transformData();
+      }).catch((error) => {
+        console.log(error);
+        dataLoading.value = false;
+        Toastify({
+          text: "Something went wrong! Please check form values",
+          duration: 2000,
+          gravity: "bottom", // `top` or `bottom`
+          position: "center", // `left`, `center` or `right`
+          stopOnFocus: false, // Prevents dismissing of toast on hover
+          style: {
+            background: 'red'
+          },
+          className: "error",
+        }).showToast();
       })
     }
 
@@ -310,6 +328,7 @@ export default {
       onSubmitButtonClick,
       determineRowClass,
       pressedCopyButton,
+      dataLoading,
     }
   },
 }
@@ -328,7 +347,7 @@ export default {
             <v-col cols="12" lg="6" class="pt-4">
                 <v-row>
                   <v-col cols="12" sm="6" class="py-0">
-                    <v-text-field label="Course (Ex: CSCE)" v-model="course" maxlength="4" @click="setupCourseElem"></v-text-field>
+                    <v-text-field label="Department (Ex: CSCE)" v-model="course" maxlength="4" @click="setupCourseElem"></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" class="py-0">
                     <v-text-field label="Course Number (Ex: 111)" v-model="courseNumber" @click="setupCourseNumber"></v-text-field>
@@ -383,8 +402,8 @@ export default {
       </v-row>
       <v-row v-if="tableData.length > 0" class="px-4 mb-4">
         <v-col cols="12">
-          <DataTable :rowClass="determineRowClass" :value="tableData" paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem">
-            <Column v-for="header of tableHeaders" :field="header" :header="header">
+          <DataTable :loading="dataLoading" :rowClass="determineRowClass" :value="tableData" paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem">
+            <Column sortable v-for="header of tableHeaders" :field="header" :header="header">
               <template v-if="header === 'Professor'"  #body="{ field, data }">
                 <div :class="data['honors'] === true ? 'shimmer' : null">
                   {{ data[field] }}

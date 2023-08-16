@@ -131,3 +131,7 @@ h5 {
         background-color: #333;
     }
 }
+
+.p-sortable-column-icon {
+    color: white !important;
+}
