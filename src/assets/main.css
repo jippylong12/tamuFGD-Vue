@@ -7,6 +7,11 @@
     width: 100%
 }
 
+.p-datatable-header{
+    background-color: lightgray !important;
+    border-color: lightgray !important;
+}
+
 th, td {
     border: 2px solid dimgray;
     border-collapse: collapse !important;

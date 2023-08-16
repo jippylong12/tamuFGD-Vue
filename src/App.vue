@@ -1,9 +1,9 @@
 <script>
-import { ref } from 'vue'
+import {ref} from 'vue'
 import axios from 'axios';
 import {DEBUG_FLAG} from "./main";
 import Toastify from 'toastify-js'
-import { FilterMatchMode } from 'primevue/api';
+import {FilterMatchMode} from 'primevue/api';
 
 export default {
   setup() {
@@ -14,6 +14,9 @@ export default {
     const filters = ref({
       'Professor': { value: null, matchMode: FilterMatchMode.CONTAINS },
     });
+    const highestGPA = ref({});
+    const lowestGPA = ref({});
+    const avgGPA = ref('N/A');
     let tableData = ref([]);
     let tableHeaders = ref([]);
     let dataLoading = ref(false);
@@ -250,11 +253,37 @@ export default {
             } else {
               obj['honors'] = false;
             }
+            row[i] = titleCase(row[i]);
           }
           obj[tableHeaders.value[i]] = row[i];
         }
         return obj;
       });
+
+
+      highestGPA.value = results.reduce((currentMax, student) => {
+        const currentGPA = student.GPA;
+        if (currentGPA > currentMax.GPA) {
+          return student;
+        }
+
+        return currentMax;
+      }, results[0]);
+
+      lowestGPA.value = results.reduce((currentMax, student) => {
+        const currentGPA = student.GPA;
+        if (currentGPA < currentMax.GPA) {
+          return student;
+        }
+
+        return currentMax;
+      }, results[0]);
+
+      const averageGPA = results
+          .map((professor) => parseFloat(professor.GPA))
+          .reduce((accumulator, currentValue) => accumulator + currentValue, 0) / results.length;
+
+      avgGPA.value = averageGPA.toFixed(2);
       tableData.value = results;
     }
 
@@ -314,8 +343,14 @@ export default {
         className: "info",
       }).showToast();
     }
-
-
+    function titleCase(str) {
+      return str.replace(
+          /\w\S*/g,
+          function(txt) {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+          }
+      );
+    }
 
     // expose the ref to the template
     return {
@@ -333,6 +368,9 @@ export default {
       pressedCopyButton,
       dataLoading,
       filters,
+      highestGPA,
+      lowestGPA,
+      avgGPA,
     }
   },
 }
@@ -409,6 +447,36 @@ export default {
           <DataTable :loading="dataLoading" :rowClass="determineRowClass" :value="tableData"
                      paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem"
                      filterDisplay="row"  v-model:filters="filters" :globalFilterFields="['Professor']">
+            <template #header>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="green"
+                  text-color="white"
+                  label
+              >
+                Highest GPA 🎓😁🏅 {{highestGPA['Professor']}} - {{highestGPA['GPA']}}
+              </v-chip>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="red"
+                  text-color="white"
+                  label>
+                Lowest GPA 😔🙏 {{lowestGPA['Professor']}} - {{lowestGPA['GPA']}}
+              </v-chip>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="blue"
+              >
+                Avg. GPA 🧮 {{avgGPA}}
+              </v-chip>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="blue-grey"
+              >
+                Total 🔢 {{tableData.length}}
+              </v-chip>
+
+            </template>
             <template #empty> No records found. </template>
             <Column sortable="true" v-for="header of tableHeaders" :field="header" :header="header"  :showFilterMenu="false" :style="header === 'Professor' ? 'min-width: 14rem' : ''">
               <template v-if="header === 'Professor'"  #body="{ field, data }">

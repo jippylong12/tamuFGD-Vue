@@ -6,7 +6,7 @@ import App from './App.vue'
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
-import {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn} from 'vuetify/components'
+import {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn, VChip} from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
@@ -20,7 +20,7 @@ import "toastify-js/src/toastify.css"
 export const DEBUG_FLAG = false;
 
 const vuetify = createVuetify({
-    components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn},
+    components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn, VChip},
     directives,
 })
 
