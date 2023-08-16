@@ -13,9 +13,10 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Paginator from "primevue/paginator";
 import "primevue/resources/themes/lara-light-indigo/theme.css";
+import "toastify-js/src/toastify.css"
 
 
-export const DEBUG_FLAG = true;
+export const DEBUG_FLAG = false;
 
 const vuetify = createVuetify({
     components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn},
