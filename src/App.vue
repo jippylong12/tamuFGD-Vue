@@ -403,7 +403,7 @@ export default {
                     ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" align-self="start">
-                    <v-btn color="black" block="true" @click="onSubmitButtonClick">Submit</v-btn>
+                    <v-btn color="black" :block=true @click="onSubmitButtonClick">Submit</v-btn>
                   </v-col>
                 </v-row>
             </v-col>
@@ -478,7 +478,7 @@ export default {
 
             </template>
             <template #empty> No records found. </template>
-            <Column sortable="true" v-for="header of tableHeaders" :field="header" :header="header"  :showFilterMenu="false" :style="header === 'Professor' ? 'min-width: 14rem' : ''">
+            <Column :sortable=true v-for="header of tableHeaders" :field="header" :header="header"  :showFilterMenu="false" :style="header === 'Professor' ? 'min-width: 14rem' : ''">
               <template v-if="header === 'Professor'"  #body="{ field, data }">
                 <div :class="data['honors'] === true ? 'shimmer' : null">
                   {{ data[field] }}
