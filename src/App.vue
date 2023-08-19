@@ -279,9 +279,10 @@ export default {
         return currentMax;
       }, results[0]) || {};
 
-      const averageGPA = results
+      const nonHonorResults = results.filter(prof => !prof.honors);
+      const averageGPA = nonHonorResults
           .map((professor) => parseFloat(professor.GPA))
-          .reduce((accumulator, currentValue) => accumulator + currentValue, 0) / results.length;
+          .reduce((accumulator, currentValue) => accumulator + currentValue, 0) / nonHonorResults.length;
 
       avgGPA.value = averageGPA.toFixed(2);
       tableData.value = results;
@@ -466,12 +467,15 @@ export default {
               <v-chip
                   class="ma-2 font-weight-bold"
                   color="blue"
+                  label
               >
-                Avg. GPA 🧮 {{avgGPA}}
+                Avg. GPA 🧮 (Non Hon) {{avgGPA}}
               </v-chip>
+
               <v-chip
                   class="ma-2 font-weight-bold"
                   color="blue-grey"
+                  label
               >
                 Total 🔢 {{tableData.length}}
               </v-chip>
