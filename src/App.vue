@@ -377,7 +377,7 @@ export default {
 </script>
 <template>
   <v-app>
-    <v-container fluid="true" class="pa-1">
+    <v-container :fluid=true class="pa-1">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
       <v-row no-gutters>
