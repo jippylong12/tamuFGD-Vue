@@ -1,2 +1,2 @@
-$env:NODE_ENV="development"
+set NODE_ENV=development
 vite build --mode development
