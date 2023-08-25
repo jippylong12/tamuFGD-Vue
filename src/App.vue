@@ -4,8 +4,10 @@ import axios from 'axios';
 import {DEBUG_FLAG} from "./main";
 import Toastify from 'toastify-js'
 import {FilterMatchMode} from 'primevue/api';
+import MainForm from "@/components/MainForm.vue";
 
 export default {
+  components: {MainForm},
   setup() {
     const course = ref('')
     const courseNumber = ref('')
@@ -229,18 +231,6 @@ export default {
         onSubmitButtonClick();
       }}
 
-    function setupCourseElem() {
-      gtag('event', 'clicked_course');
-    }
-
-    function setupCourseNumber() {
-      gtag('event', 'clicked_course_number');
-    }
-
-    function setupSortBy() {
-      gtag('event', 'clicked_sort_by');
-    }
-
     // turn from array to Objects with headers matching key
     function transformData() {
       const results = tableData.value.map((row, index) => {
@@ -361,9 +351,6 @@ export default {
       sortByValue,
       tableData,
       tableHeaders,
-      setupCourseElem,
-      setupCourseNumber,
-      setupSortBy,
       onSubmitButtonClick,
       determineRowClass,
       pressedCopyButton,
@@ -381,36 +368,7 @@ export default {
     <v-container :fluid=true class="pa-1">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
-      <v-row no-gutters>
-        <v-col cols="12" class="mt-2 px-4">
-          <v-row justify="center" no-gutters>
-            <v-col cols="12">
-              <p class="text-center text-h6">Enter the course information below and press submit. Golden rows are Honors only.</p>
-            </v-col>
-            <v-col cols="12" lg="6" class="pt-4">
-                <v-row>
-                  <v-col cols="12" sm="6" class="py-0">
-                    <v-text-field label="Department (Ex: CSCE)" v-model="course" maxlength="4" @click="setupCourseElem"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" class="py-0">
-                    <v-text-field label="Course Number (Ex: 111)" v-model="courseNumber" @click="setupCourseNumber"></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" class="py-0">
-                    <v-select
-                        label="Sort By:"
-                        v-model="sortByValue"
-                        :items="sortByOptions"
-                        @change="setupSortBy"
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6" align-self="start">
-                    <v-btn color="black" :block=true @click="onSubmitButtonClick">Submit</v-btn>
-                  </v-col>
-                </v-row>
-            </v-col>
-          </v-row>
-        </v-col>
-      </v-row>
+      <MainForm v-model:course="course" v-model:course-number="courseNumber" v-model:sort-by-value="sortByValue" :sort-by-options=sortByOptions @submit-btn-click="onSubmitButtonClick"/>
 
       <v-row no-gutters v-if="tableData.length === 0 && !dataLoading">
         <v-col cols="12" class="py-2">
