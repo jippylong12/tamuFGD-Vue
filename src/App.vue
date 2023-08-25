@@ -11,10 +11,13 @@ export default {
   setup() {
     const course = ref('')
     const courseNumber = ref('')
-    const sortByOptions = [{value: '1', title: 'GPA'}, {value: '2', title: 'Professor Last Name'}];
+    const sortByOptions = [{value: '1', title: 'GPA'}, {
+      value: '2',
+      title: 'Professor Last Name'
+    }];
     const sortByValue = ref({value: '1', title: 'GPA'});
     const filters = ref({
-      'Professor': { value: null, matchMode: FilterMatchMode.CONTAINS },
+      'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
     });
     const highestGPA = ref({});
     const lowestGPA = ref({});
@@ -22,7 +25,7 @@ export default {
     let tableData = ref([]);
     let tableHeaders = ref([]);
     let dataLoading = ref(false);
-    if(DEBUG_FLAG) {
+    if (DEBUG_FLAG) {
       tableData.value = [
         [
           "DAUGHERITY W*",
@@ -182,7 +185,11 @@ export default {
     }
 
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
     gtag('js', new Date());
 
     gtag('config', 'G-B24WEF5K6V');
@@ -203,7 +210,7 @@ export default {
       if (response.status === 200) {
         // The request was successful
         const data = response.data;
-        if(data.success){
+        if (data.success) {
           tableHeaders.value = data.headers;
           tableData.value = data.results;
         }
@@ -220,23 +227,24 @@ export default {
       course.value = searchParams.get("course");
       courseNumber.value = searchParams.get("number");
       let sortByParamValue = searchParams.get("sort_by")
-      if(sortByParamValue){
+      if (sortByParamValue) {
         let sortVal = sortByOptions.find((a) => a.value === sortByParamValue)
-        if(sortVal){
+        if (sortVal) {
           sortByValue.value = sortVal
         }
       }
 
       if (course.value && courseNumber.value) {
         onSubmitButtonClick();
-      }}
+      }
+    }
 
     // turn from array to Objects with headers matching key
     function transformData() {
       const results = tableData.value.map((row, index) => {
         const obj = {};
         for (let i = 0; i < tableHeaders.value.length; i++) {
-          if(i === 0){
+          if (i === 0) {
             if (row[i].includes("*")) {
               row[i] = row[i].replace("*", "");
               obj['honors'] = true;
@@ -306,12 +314,14 @@ export default {
     }
 
     function determineRowClass(row) {
-      if(row.honors) {
+      if (row.honors) {
         return 'honors'
-      } else {return null;}
+      } else {
+        return null;
+      }
     }
 
-    if(DEBUG_FLAG){
+    if (DEBUG_FLAG) {
       transformData();
     }
 
@@ -334,10 +344,11 @@ export default {
         className: "info",
       }).showToast();
     }
+
     function titleCase(str) {
       return str.replace(
           /\w\S*/g,
-          function(txt) {
+          function (txt) {
             return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
           }
       );
@@ -368,28 +379,42 @@ export default {
     <v-container :fluid=true class="pa-1">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
-      <MainForm v-model:course="course" v-model:course-number="courseNumber" v-model:sort-by-value="sortByValue" :sort-by-options=sortByOptions @submit-btn-click="onSubmitButtonClick"/>
+      <MainForm v-model:course="course" v-model:course-number="courseNumber"
+                v-model:sort-by-value="sortByValue"
+                :sort-by-options=sortByOptions
+                @submit-btn-click="onSubmitButtonClick"/>
 
       <v-row no-gutters v-if="tableData.length === 0 && !dataLoading">
         <v-col cols="12" class="py-2">
           <h5 class="suggestion"> Data from Spring 2012 - Spring 2023</h5>
-          <h5 class="suggestion"> <a href="mailto: jippylong12@gmail.com">Email</a> for suggestions</h5>
-          <h5 class="suggestion"><a href="http://www.jippylong12.xyz">Me</a></h5>
+          <h5 class="suggestion"><a
+              href="mailto: jippylong12@gmail.com">Email</a> for suggestions
+          </h5>
+          <h5 class="suggestion"><a href="http://www.jippylong12.xyz">Me</a>
+          </h5>
         </v-col>
 
         <v-col cols="12" class="px-4 py-4">
-          <p class="text-center"> I want this to be helpful to all students. </p>
-          <p class="text-center">An education is the best indicator of success, but you don't have to be dumb going about getting one.</p>
-          <p class="text-center mb-4"> I will keep updating the course data as long as I can.</p>
+          <p class="text-center"> I want this to be helpful to all
+            students. </p>
+          <p class="text-center">An education is the best indicator of success,
+            but you don't have to be dumb going about getting one.</p>
+          <p class="text-center mb-4"> I will keep updating the course data as
+            long as I can.</p>
           <ul class="text-center">
-            <li><a href="https://github.com/jippylong12/TAMU_FGD_FRONT_END"> Front-end Code</a></li>
-            <li><a href="https://github.com/jippylong12/TAMU_FGD">Server Code</a></li>
-            <li><a href="https://drive.google.com/drive/folders/0B6WlnfAGiKk9ZlEwcElEZW9rUE0?resourcekey=0-bkINHRtazSza6dDL8MIyIg&usp=sharing"> CSV DB Files</a></li>
+            <li><a href="https://github.com/jippylong12/TAMU_FGD_FRONT_END">
+              Front-end Code</a></li>
+            <li><a href="https://github.com/jippylong12/TAMU_FGD">Server
+              Code</a></li>
+            <li><a
+                href="https://drive.google.com/drive/folders/0B6WlnfAGiKk9ZlEwcElEZW9rUE0?resourcekey=0-bkINHRtazSza6dDL8MIyIg&usp=sharing">
+              CSV DB Files</a></li>
           </ul>
         </v-col>
 
         <v-col cols="12" class="py-2">
-          <p style="text-align: center"><b>I'm glad this website is helping people. </b> </p>
+          <p style="text-align: center"><b>I'm glad this website is helping
+            people. </b></p>
         </v-col>
         <v-col cols="12">
           <h5 class="suggestion"> Thanks & Acknowledgements</h5>
@@ -403,9 +428,12 @@ export default {
       </v-row>
       <v-row v-if="tableData.length > 0 || dataLoading" class="px-4 mb-4">
         <v-col cols="12">
-          <DataTable :loading="dataLoading" :rowClass="determineRowClass" :value="tableData"
-                     paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]" tableStyle="min-width: 50rem"
-                     filterDisplay="row"  v-model:filters="filters" :globalFilterFields="['Professor']">
+          <DataTable :loading="dataLoading" :rowClass="determineRowClass"
+                     :value="tableData"
+                     paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]"
+                     tableStyle="min-width: 50rem"
+                     filterDisplay="row" v-model:filters="filters"
+                     :globalFilterFields="['Professor']">
             <template #header>
               <v-chip
                   class="ma-2 font-weight-bold"
@@ -413,21 +441,23 @@ export default {
                   text-color="white"
                   label
               >
-                Highest GPA 🎓😁🏅 {{highestGPA['Professor']}} - {{highestGPA['GPA']}}
+                Highest GPA 🎓😁🏅 {{ highestGPA['Professor'] }} -
+                {{ highestGPA['GPA'] }}
               </v-chip>
               <v-chip
                   class="ma-2 font-weight-bold"
                   color="red"
                   text-color="white"
                   label>
-                Lowest GPA 😔🙏 {{lowestGPA['Professor']}} - {{lowestGPA['GPA']}}
+                Lowest GPA 😔🙏 {{ lowestGPA['Professor'] }} -
+                {{ lowestGPA['GPA'] }}
               </v-chip>
               <v-chip
                   class="ma-2 font-weight-bold"
                   color="blue"
                   label
               >
-                Avg. GPA 🧮 (Non Hon) {{avgGPA}}
+                Avg. GPA 🧮 (Non Hon) {{ avgGPA }}
               </v-chip>
 
               <v-chip
@@ -435,19 +465,24 @@ export default {
                   color="blue-grey"
                   label
               >
-                Total 🔢 {{tableData.length}}
+                Total 🔢 {{ tableData.length }}
               </v-chip>
 
             </template>
-            <template #empty> No records found. </template>
-            <Column :sortable=true v-for="header of tableHeaders" :field="header" :header="header"  :showFilterMenu="false" :style="header === 'Professor' ? 'min-width: 14rem' : ''">
-              <template v-if="header === 'Professor'"  #body="{ field, data }">
+            <template #empty> No records found.</template>
+            <Column :sortable=true v-for="header of tableHeaders"
+                    :field="header" :header="header" :showFilterMenu="false"
+                    :style="header === 'Professor' ? 'min-width: 14rem' : ''">
+              <template v-if="header === 'Professor'" #body="{ field, data }">
                 <div :class="data['honors'] === true ? 'shimmer' : null">
                   {{ data[field] }}
                 </div>
               </template>
-              <template v-if="header === 'Professor'" #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()"  type="text" class="p-column-filter" placeholder="Filter" />
+              <template v-if="header === 'Professor'"
+                        #filter="{ filterModel, filterCallback }">
+                <InputText v-model="filterModel.value" @input="filterCallback()"
+                           type="text" class="p-column-filter"
+                           placeholder="Filter"/>
               </template>
             </Column>
 
@@ -455,10 +490,13 @@ export default {
         </v-col>
       </v-row>
 
-      <div v-if="tableData.length > 0" id="copy-url-button" @click="pressedCopyButton">
+      <div v-if="tableData.length > 0" id="copy-url-button"
+           @click="pressedCopyButton">
         <button class="copy-url-button">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
-            <path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+               fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
+            <path
+                d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
           </svg>
           <span class="ms-1">
                 Share
