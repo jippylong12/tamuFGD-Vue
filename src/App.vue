@@ -3,7 +3,6 @@ import {ref} from 'vue'
 import axios from 'axios';
 import {DEBUG_FLAG} from "./main";
 import Toastify from 'toastify-js'
-import {FilterMatchMode} from 'primevue/api';
 import MainForm from "@/components/MainForm.vue";
 import GeneralInfo from "@/components/GeneralInfo.vue";
 import ShareButton from "@/components/ShareButton.vue";
@@ -318,26 +317,6 @@ export default {
       transformData();
     }
 
-    async function pressedCopyButton() {
-      showToast()
-      let currentUrl = `https://grades.jippylong12.xyz/?course=${course.value}&number=${courseNumber.value}&sort_by=${sortByValue.value['value']}`;
-      await navigator.clipboard.writeText(currentUrl);
-    }
-
-    async function showToast() {
-      Toastify({
-        text: "Copied!",
-        duration: 1000,
-        gravity: "bottom", // `top` or `bottom`
-        position: "center", // `left`, `center` or `right`
-        stopOnFocus: false, // Prevents dismissing of toast on hover
-        style: {
-          background: 'black'
-        },
-        className: "info",
-      }).showToast();
-    }
-
     function titleCase(str) {
       return str.replace(
           /\w\S*/g,
@@ -356,7 +335,6 @@ export default {
       tableData,
       tableHeaders,
       onSubmitButtonClick,
-      pressedCopyButton,
       dataLoading,
       highestGPA,
       lowestGPA,
@@ -380,7 +358,12 @@ export default {
                     :highestGPA="highestGPA" :lowestGPA="lowestGPA"
                     :table-headers="tableHeaders" :avgGPA="avgGPA" />
 
-      <ShareButton :show="tableData.length > 0" @click="pressedCopyButton"/>
+      <ShareButton v-bind="{
+        show: tableData.length > 0,
+        course,
+        courseNumber,
+        sortByValue,
+      }"/>
     </v-container>
   </v-app>
 
