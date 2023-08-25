@@ -7,6 +7,7 @@ import MainForm from "@/components/MainForm.vue";
 import GeneralInfo from "@/components/GeneralInfo.vue";
 import ShareButton from "@/components/ShareButton.vue";
 import ResultsTable from "@/components/ResultsTable.vue";
+import 'primeicons/primeicons.css';
 
 export default {
   components: {ResultsTable, ShareButton, GeneralInfo, MainForm},

@@ -8,6 +8,8 @@
 }
 
 .p-datatable-header{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     background-color: lightgray !important;
     border-color: lightgray !important;
 }

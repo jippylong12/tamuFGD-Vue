@@ -4,6 +4,7 @@ import {ref, onUpdated} from "vue";
 
 const props = defineProps(['tableData', 'dataLoading', 'tableHeaders',])
 const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
 let transformedData = transformData();
@@ -101,40 +102,48 @@ function transformData() {
                  filterDisplay="row" v-model:filters="filters"
                  :globalFilterFields="['Professor']">
         <template #header>
-          <v-chip
-              class="ma-2 font-weight-bold"
-              color="green"
-              text-color="white"
-              :label="true"
-          >
-            Highest GPA 🎓😁🏅 {{ highestGPA['Professor'] }} -
-            {{ highestGPA['GPA'] }}
-          </v-chip>
-          <v-chip
-              class="ma-2 font-weight-bold"
-              color="red"
-              text-color="white"
-              :label="true"
+          <v-row no-gutters>
+            <v-col cols="12" sm="8" lg="10" align-self="center">
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="green"
+                  text-color="white"
+                  :label="true"
+              >
+                Highest GPA 🎓😁🏅 {{ highestGPA['Professor'] }} -
+                {{ highestGPA['GPA'] }}
+              </v-chip>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="red"
+                  text-color="white"
+                  :label="true"
 
-          >
-            Lowest GPA 😔🙏 {{ lowestGPA['Professor'] }} -
-            {{ lowestGPA['GPA'] }}
-          </v-chip>
-          <v-chip
-              class="ma-2 font-weight-bold"
-              color="blue"
-              :label="true"
-          >
-            Avg. GPA 🧮 (Non Hon) {{ avgGPA }}
-          </v-chip>
+              >
+                Lowest GPA 😔🙏 {{ lowestGPA['Professor'] }} -
+                {{ lowestGPA['GPA'] }}
+              </v-chip>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="blue"
+                  :label="true"
+              >
+                Avg. GPA 🧮 (Non Hon) {{ avgGPA }}
+              </v-chip>
 
-          <v-chip
-              class="ma-2 font-weight-bold"
-              color="blue-grey"
-              :label="true"
-          >
-            Total 🔢 {{ transformedData.length }}
-          </v-chip>
+              <v-chip
+                  class="ma-2 font-weight-bold"
+                  color="blue-grey"
+                  :label="true"
+              >
+                Total 🔢 {{ transformedData.length }}
+              </v-chip>
+            </v-col>
+            <v-col cols="12" sm="4" lg="2">
+              <v-text-field v-model="filters['global'].value" placeholder="Search" color="white" variant="solo-filled"/>
+            </v-col>
+          </v-row>
+
 
         </template>
         <template #empty> No records found.</template>
@@ -146,12 +155,7 @@ function transformData() {
               {{ data[field] }}
             </div>
           </template>
-          <template v-if="header === 'Professor'"
-                    #filter="{ filterModel, filterCallback }">
-            <InputText v-model="filterModel.value" @input="filterCallback()"
-                       type="text" class="p-column-filter"
-                       placeholder="Filter"/>
-          </template>
+
         </Column>
 
       </DataTable>
@@ -159,3 +163,17 @@ function transformData() {
   </v-row>
 
 </template>
+
+<style scoped>
+
+.search-box {
+  color: black;
+  background-color: white;
+}
+
+.search-box::placeholder {
+  background-color: whitesmoke;
+  color: black;
+}
+
+</style>
