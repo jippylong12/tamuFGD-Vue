@@ -1,5 +1,5 @@
 <script setup>
-defineProps(['course', 'courseNumber', 'sortByValue', 'sortByOptions'])
+const props = defineProps(['course', 'courseNumber', 'sortByValue', 'sortByOptions'])
 const emits = defineEmits(['update:course', 'update:courseNumber', 'update:sortByValue', 'submitBtnClick'])
 
 function gtag(){dataLayer.push(arguments);}
@@ -14,7 +14,7 @@ function onClickCourseNumber() {
 
 function onChangeSortBy(val) {
   gtag('event', 'clicked_sort_by');
-  emits('update:sortByValue', {value: val});
+  emits('update:sortByValue', props.sortByOptions.find((a) => a.value === val));
 }
 </script>
 
