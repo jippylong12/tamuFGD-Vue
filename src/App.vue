@@ -7,9 +7,10 @@ import {FilterMatchMode} from 'primevue/api';
 import MainForm from "@/components/MainForm.vue";
 import GeneralInfo from "@/components/GeneralInfo.vue";
 import ShareButton from "@/components/ShareButton.vue";
+import ResultsTable from "@/components/ResultsTable.vue";
 
 export default {
-  components: {ShareButton, GeneralInfo, MainForm},
+  components: {ResultsTable, ShareButton, GeneralInfo, MainForm},
   setup() {
     const course = ref('')
     const courseNumber = ref('')
@@ -18,9 +19,7 @@ export default {
       title: 'Professor Last Name'
     }];
     const sortByValue = ref({value: '1', title: 'GPA'});
-    const filters = ref({
-      'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
-    });
+
     const highestGPA = ref({});
     const lowestGPA = ref({});
     const avgGPA = ref('N/A');
@@ -315,14 +314,6 @@ export default {
       })
     }
 
-    function determineRowClass(row) {
-      if (row.honors) {
-        return 'honors'
-      } else {
-        return null;
-      }
-    }
-
     if (DEBUG_FLAG) {
       transformData();
     }
@@ -365,10 +356,8 @@ export default {
       tableData,
       tableHeaders,
       onSubmitButtonClick,
-      determineRowClass,
       pressedCopyButton,
       dataLoading,
-      filters,
       highestGPA,
       lowestGPA,
       avgGPA,
@@ -387,69 +376,9 @@ export default {
                 @submit-btn-click="onSubmitButtonClick"/>
       <GeneralInfo :show="tableData.length === 0 && !dataLoading"/>
 
-      <v-row v-if="tableData.length > 0 || dataLoading" class="px-4 mb-4">
-        <v-col cols="12">
-          <DataTable :loading="dataLoading" :rowClass="determineRowClass"
-                     :value="tableData"
-                     paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]"
-                     tableStyle="min-width: 50rem"
-                     filterDisplay="row" v-model:filters="filters"
-                     :globalFilterFields="['Professor']">
-            <template #header>
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="green"
-                  text-color="white"
-                  label
-              >
-                Highest GPA 🎓😁🏅 {{ highestGPA['Professor'] }} -
-                {{ highestGPA['GPA'] }}
-              </v-chip>
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="red"
-                  text-color="white"
-                  label>
-                Lowest GPA 😔🙏 {{ lowestGPA['Professor'] }} -
-                {{ lowestGPA['GPA'] }}
-              </v-chip>
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="blue"
-                  label
-              >
-                Avg. GPA 🧮 (Non Hon) {{ avgGPA }}
-              </v-chip>
-
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="blue-grey"
-                  label
-              >
-                Total 🔢 {{ tableData.length }}
-              </v-chip>
-
-            </template>
-            <template #empty> No records found.</template>
-            <Column :sortable=true v-for="header of tableHeaders"
-                    :field="header" :header="header" :showFilterMenu="false"
-                    :style="header === 'Professor' ? 'min-width: 14rem' : ''">
-              <template v-if="header === 'Professor'" #body="{ field, data }">
-                <div :class="data['honors'] === true ? 'shimmer' : null">
-                  {{ data[field] }}
-                </div>
-              </template>
-              <template v-if="header === 'Professor'"
-                        #filter="{ filterModel, filterCallback }">
-                <InputText v-model="filterModel.value" @input="filterCallback()"
-                           type="text" class="p-column-filter"
-                           placeholder="Filter"/>
-              </template>
-            </Column>
-
-          </DataTable>
-        </v-col>
-      </v-row>
+      <ResultsTable :table-data="tableData" :data-loading="dataLoading"
+                    :highestGPA="highestGPA" :lowestGPA="lowestGPA"
+                    :table-headers="tableHeaders" :avgGPA="avgGPA" />
 
       <ShareButton :show="tableData.length > 0" @click="pressedCopyButton"/>
     </v-container>
