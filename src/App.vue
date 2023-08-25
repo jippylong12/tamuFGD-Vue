@@ -216,8 +216,6 @@ export default {
         // The request failed
         console.log(response.error);
       }
-
-      dataLoading.value = false;
     };
 
     function addSearchParams() {
@@ -246,7 +244,7 @@ export default {
         sort_by: sortByValue.value['title'],
       });
       makePostRequest().then((response) => {
-
+        dataLoading.value = false;
       }).catch((error) => {
         console.log(error);
         dataLoading.value = false;

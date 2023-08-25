@@ -1,6 +1,6 @@
 <script setup>
 import {FilterMatchMode} from "primevue/api";
-import {ref} from "vue";
+import {ref, onUpdated} from "vue";
 
 const props = defineProps(['tableData', 'dataLoading', 'tableHeaders',])
 const filters = ref({
@@ -10,6 +10,15 @@ let transformedData = transformData();
 let highestGPA = getHighestGPA(transformedData);
 let lowestGPA = getLowestGPA(transformedData);
 let avgGPA = getAverageGPA(transformedData);
+
+onUpdated(() => {
+  if(props.dataLoading){
+    transformedData = transformData();
+    highestGPA = getHighestGPA(transformedData);
+    lowestGPA = getLowestGPA(transformedData);
+    avgGPA = getAverageGPA(transformedData);
+  }
+})
 
 function determineRowClass(row) {
   if (row.honors) {
