@@ -120,22 +120,7 @@ h5 {
     background-color: lightgray !important;
 }
 
-.copy-url-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #000;
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 32px;
-    cursor: pointer;
-}
 
-@media (hover: hover) {
-    .copy-url-button:hover {
-        background-color: #333;
-    }
-}
 
 .p-sortable-column-icon {
     color: white !important;
