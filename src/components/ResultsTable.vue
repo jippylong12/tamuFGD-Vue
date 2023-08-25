@@ -1,11 +1,16 @@
 <script setup>
-import {ref} from "vue";
 import {FilterMatchMode} from "primevue/api";
+import {ref} from "vue";
 
-defineProps(['tableData', 'dataLoading', 'highestGPA', 'lowestGPA', 'tableHeaders', 'avgGPA'])
+const props = defineProps(['tableData', 'dataLoading', 'tableHeaders',])
 const filters = ref({
   'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
+let transformedData = transformData();
+let highestGPA = getHighestGPA(transformedData);
+let lowestGPA = getLowestGPA(transformedData);
+let avgGPA = getAverageGPA(transformedData);
+
 function determineRowClass(row) {
   if (row.honors) {
     return 'honors'
@@ -14,13 +19,74 @@ function determineRowClass(row) {
   }
 }
 
+function getHighestGPA(data) {
+  return data.reduce((currentMax, student) => {
+    const currentGPA = student.GPA;
+    if (currentGPA > currentMax.GPA) {
+      return student;
+    }
+
+    return currentMax;
+  }, data[0]) || {};
+}
+
+function getLowestGPA(data) {
+  return data.reduce((currentMax, student) => {
+    const currentGPA = student.GPA;
+    if (currentGPA < currentMax.GPA) {
+      return student;
+    }
+
+    return currentMax;
+  }, data[0]) || {};
+}
+
+function getAverageGPA(data) {
+  const nonHonorResults = data.filter(prof => !prof.honors);
+  const averageGPA = nonHonorResults
+      .map((professor) => parseFloat(professor.GPA))
+      .reduce((accumulator, currentValue) => accumulator + currentValue, 0) / nonHonorResults.length;
+
+  return averageGPA.toFixed(2);
+}
+
+// turn from array to Objects with headers matching key
+function transformData() {
+  return props.tableData.map((row, index) => {
+    const obj = {};
+    for (let i = 0; i < props.tableHeaders.length; i++) {
+      if (i === 0) {
+        if (row[i].includes("*")) {
+          row[i] = row[i].replace("*", "");
+          obj['honors'] = true;
+        } else {
+          obj['honors'] = false;
+        }
+        row[i] = titleCase(row[i]);
+      }
+      obj[props.tableHeaders[i]] = row[i];
+    }
+    return obj;
+  });
+
+  function titleCase(str) {
+    return str.replace(
+        /\w\S*/g,
+        function (txt) {
+          return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        }
+    );
+  }
+
+}
+
 
 </script>
 <template>
-  <v-row v-if="tableData.length > 0 || dataLoading" class="px-4 mb-4">
+  <v-row v-if="transformedData.length > 0 || dataLoading" class="px-4 mb-4">
     <v-col cols="12">
       <DataTable :loading="dataLoading" :rowClass="determineRowClass"
-                 :value="tableData"
+                 :value="transformedData"
                  paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]"
                  tableStyle="min-width: 50rem"
                  filterDisplay="row" v-model:filters="filters"
@@ -58,7 +124,7 @@ function determineRowClass(row) {
               color="blue-grey"
               :label="true"
           >
-            Total 🔢 {{ tableData.length }}
+            Total 🔢 {{ transformedData.length }}
           </v-chip>
 
         </template>
