@@ -294,6 +294,12 @@ export default {
         tableHeaders,
       }"/>
 
+      <v-row no-gutters v-if="!(tableData.length === 0 && !dataLoading)" class="mt-0 mb-4">
+        <v-col cols="12" class="py-0">
+          <h5 class="suggestion"><a href="https://www.jippylong12.xyz">👋🏽 Me</a></h5>
+        </v-col>
+      </v-row>
+
       <ShareButton v-bind="{
         show: tableData.length > 0,
         course,

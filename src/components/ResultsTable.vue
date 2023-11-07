@@ -93,7 +93,7 @@ function transformData() {
 
 </script>
 <template>
-  <v-row v-if="transformedData.length > 0 || dataLoading" class="px-4 mb-4">
+  <v-row v-if="transformedData.length > 0 || dataLoading" class="px-4">
     <v-col cols="12">
       <DataTable :loading="dataLoading" :rowClass="determineRowClass"
                  :value="transformedData"
