@@ -4,12 +4,13 @@ import axios from 'axios';
 import MainForm from "@/components/MainForm.vue";
 import GeneralInfo from "@/components/GeneralInfo.vue";
 import ShareButton from "@/components/ShareButton.vue";
+import FeedbackLink from "@/components/FeedbackLink.vue";
 import ResultsTable from "@/components/ResultsTable.vue";
 import { useResultsQuery } from '@/composables/useResultsQuery.js';
 import 'primeicons/primeicons.css';
 
 export default {
-  components: {ResultsTable, ShareButton, GeneralInfo, MainForm},
+  components: {ResultsTable, ShareButton, FeedbackLink, GeneralInfo, MainForm},
   setup() {
     const DEFAULT_FILTER_STATE = {
       globalFilter: null,
@@ -182,6 +183,19 @@ export default {
       <v-row no-gutters v-if="!(tableData.length === 0 && !dataLoading)" class="mt-0 mb-4">
         <v-col cols="12" class="py-0">
           <h5 class="suggestion"><a href="https://www.jippylong12.xyz">👋🏽 Me</a></h5>
+        </v-col>
+      </v-row>
+
+      <v-row no-gutters class="mt-0 mb-1">
+        <v-col cols="12" class="text-center py-2">
+              <FeedbackLink v-bind="{
+                show: true,
+                course,
+                courseNumber,
+                sortByValue,
+                filterState: tableFilterState,
+                isResultsContext: tableData.length > 0,
+              }"/>
         </v-col>
       </v-row>
 
