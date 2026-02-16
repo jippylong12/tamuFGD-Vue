@@ -1,5 +1,26 @@
 <script setup>
-const props = defineProps(['course', 'courseNumber', 'sortByValue', 'sortByOptions'])
+const props = defineProps({
+  course: {
+    type: String,
+    required: true,
+  },
+  courseNumber: {
+    type: String,
+    required: true,
+  },
+  sortByValue: {
+    type: Object,
+    required: true,
+  },
+  sortByOptions: {
+    type: Array,
+    required: true,
+  },
+  validationErrors: {
+    type: Object,
+    default: () => ({}),
+  },
+})
 const emits = defineEmits(['update:course', 'update:courseNumber', 'update:sortByValue', 'submitBtnClick'])
 
 function gtag(){dataLayer.push(arguments);}
@@ -27,11 +48,22 @@ function onChangeSortBy(val) {
         </v-col>
         <v-col cols="12" lg="6" class="pt-4">
           <v-row>
-            <v-col cols="12" sm="6" class="py-0">
-              <v-text-field label="Department (Ex: CSCE)" :value="course" @input="$emit('update:course', $event.target.value)" maxlength="4" @click="onClickCourse"></v-text-field>
+          <v-col cols="12" sm="6" class="py-0">
+              <v-text-field
+                  label="Department (Ex: CSCE)"
+                  :value="course"
+                  :error-messages="validationErrors.course"
+                  @input="$emit('update:course', $event.target.value)"
+                  maxlength="4"
+                  @click="onClickCourse"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="py-0">
-              <v-text-field label="Course Number (Ex: 111)" :input="courseNumber" @input="$emit('update:courseNumber', $event.target.value)" @click="onClickCourseNumber"></v-text-field>
+              <v-text-field
+                  label="Course Number (Ex: 111)"
+                  :error-messages="validationErrors.course_number"
+                  :input="courseNumber"
+                  @input="$emit('update:courseNumber', $event.target.value)"
+                  @click="onClickCourseNumber"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="py-0">
               <v-select
