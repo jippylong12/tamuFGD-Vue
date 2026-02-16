@@ -1,17 +1,27 @@
 <script setup>
-import {FilterMatchMode} from "primevue/api";
+import {FilterMatchMode, FilterOperator} from "primevue/api";
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 
 const props = defineProps(['tableData', 'dataLoading', 'tableHeaders',])
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
+  'GPA': {
+    operator: FilterOperator.AND,
+    constraints: [
+      {value: null, matchMode: FilterMatchMode.GREATER_THAN_OR_EQUAL_TO},
+      {value: null, matchMode: FilterMatchMode.LESS_THAN_OR_EQUAL_TO},
+    ],
+  },
+  honors: {value: null, matchMode: FilterMatchMode.EQUALS},
 });
 const selectedRow = ref(null);
 const transformedData = computed(() => transformData());
-const highestGPA = computed(() => getHighestGPA(transformedData.value));
-const lowestGPA = computed(() => getLowestGPA(transformedData.value));
-const avgGPA = computed(() => getAverageGPA(transformedData.value));
+const filteredRows = ref([]);
+const totalRows = computed(() => transformedData.value.length);
+const highestGPA = computed(() => getHighestGPA(filteredRows.value));
+const lowestGPA = computed(() => getLowestGPA(filteredRows.value));
+const avgGPA = computed(() => getAverageGPA(filteredRows.value));
 const gradeColumns = [
   {key: 'A', label: 'A', field: "% of A's", color: '#1b5e20'},
   {key: 'B', label: 'B', field: "% of B's", color: '#2e7d32'},
@@ -31,6 +41,90 @@ const selectedGradeBuckets = computed(() => {
     };
   });
 });
+const globalFilterText = computed({
+  get() {
+    return filters.value.global.value;
+  },
+  set(nextValue) {
+    filters.value.global.value = normalizeFilterText(nextValue);
+  },
+});
+const professorFilterText = computed({
+  get() {
+    return filters.value['Professor'].value;
+  },
+  set(nextValue) {
+    filters.value['Professor'].value = normalizeFilterText(nextValue);
+  },
+});
+const gpaMinFilter = computed({
+  get() {
+    return filters.value['GPA'].constraints[0].value;
+  },
+  set(nextValue) {
+    filters.value['GPA'].constraints[0].value = normalizeNumericFilter(nextValue);
+  },
+});
+const gpaMaxFilter = computed({
+  get() {
+    return filters.value['GPA'].constraints[1].value;
+  },
+  set(nextValue) {
+    filters.value['GPA'].constraints[1].value = normalizeNumericFilter(nextValue);
+  },
+});
+const honorsOnlyFilter = computed({
+  get() {
+    return filters.value.honors.value === true;
+  },
+  set(nextValue) {
+    filters.value.honors.value = nextValue ? true : null;
+  },
+});
+const hasActiveFilters = computed(() => {
+  return activeFiltersCount.value > 0;
+});
+const activeFiltersCount = computed(() => {
+  let nextCount = 0;
+  if (normalizeFilterText(filters.value.global.value) !== null) {
+    nextCount += 1;
+  }
+  if (normalizeFilterText(filters.value['Professor'].value) !== null) {
+    nextCount += 1;
+  }
+  if (filters.value['GPA'].constraints[0].value !== null && filters.value['GPA'].constraints[0].value !== '') {
+    nextCount += 1;
+  }
+  if (filters.value['GPA'].constraints[1].value !== null && filters.value['GPA'].constraints[1].value !== '') {
+    nextCount += 1;
+  }
+  if (filters.value.honors.value === true) {
+    nextCount += 1;
+  }
+  return nextCount;
+});
+
+function normalizeFilterText(value) {
+  if (typeof value !== 'string') {
+    return value || null;
+  }
+
+  const nextValue = value.trim();
+  return nextValue || null;
+}
+
+function normalizeNumericFilter(value) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const nextValue = Number(value);
+  if (Number.isNaN(nextValue) || !Number.isFinite(nextValue)) {
+    return null;
+  }
+
+  return nextValue;
+}
 
 const panelStorageKey = 'fgd-results-details-panel-state-v1';
 const defaultPanelState = {
@@ -329,9 +423,29 @@ function parsePercent(value) {
   return Math.max(0, Math.min(100, numericValue));
 }
 
+function onFilter(event) {
+  const nextRows = event && Array.isArray(event.filteredValue) ? event.filteredValue : transformedData.value;
+  filteredRows.value = nextRows;
+}
+
+function syncFilteredRowsFromTransformedData() {
+  filteredRows.value = transformedData.value;
+}
+
+function clearAllTableFilters() {
+  filters.value.global.value = null;
+  filters.value['Professor'].value = null;
+  filters.value['GPA'].constraints[0].value = null;
+  filters.value['GPA'].constraints[1].value = null;
+  filters.value.honors.value = null;
+  filteredRows.value = transformedData.value;
+}
+
 watch(() => props.tableData, () => {
   selectedRow.value = null;
+  syncFilteredRowsFromTransformedData();
 }, {deep: true});
+watch(transformedData, syncFilteredRowsFromTransformedData, {immediate: true});
 
 onMounted(() => {
   panelState.value = readPanelState();
@@ -359,61 +473,131 @@ onBeforeUnmount(() => {
                  paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]"
                  tableStyle="min-width: 50rem"
                  filterDisplay="row" v-model:filters="filters"
-                 :globalFilterFields="['Professor']">
+                 :globalFilterFields="tableHeaders"
+                 @filter="onFilter">
         <template #header>
-          <v-row no-gutters>
-            <v-col cols="12" sm="8" lg="10" align-self="center">
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="green"
-                  text-color="white"
-                  :label="true"
-              >
-                Highest GPA 🎓😁🏅 {{ highestGPA['Professor'] }} -
-                {{ highestGPA['GPA'] }}
-              </v-chip>
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="red"
-                  text-color="white"
-                  :label="true"
-
-              >
-                Lowest GPA 😔🙏 {{ lowestGPA['Professor'] }} -
-                {{ lowestGPA['GPA'] }}
-              </v-chip>
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="blue"
-                  :label="true"
-              >
-                Avg. GPA 🧮 (Non Hon) {{ avgGPA }}
-              </v-chip>
-
-              <v-chip
-                  class="ma-2 font-weight-bold"
-                  color="blue-grey"
-                  :label="true"
-              >
-                Total 🔢 {{ transformedData.length }}
-              </v-chip>
-            </v-col>
-            <v-col cols="12" sm="4" lg="2">
-              <v-text-field v-model="filters['global'].value" placeholder="Search" color="white" variant="solo-filled"/>
-            </v-col>
-          </v-row>
-
-
+          <div class="results-header-sheet pa-3">
+            <div class="results-summary-row">
+              <div class="results-summary-chips d-flex flex-wrap align-center">
+                <v-chip class="font-weight-bold" color="green" text-color="white" :label="true">
+                  Highest GPA 🎓 {{ highestGPA['Professor'] }} - {{ highestGPA['GPA'] }}
+                </v-chip>
+                <v-chip class="font-weight-bold" color="red" text-color="white" :label="true">
+                  Lowest GPA 😔 {{ lowestGPA['Professor'] }} - {{ lowestGPA['GPA'] }}
+                </v-chip>
+                <v-chip class="font-weight-bold" color="blue" :label="true">
+                  Avg. GPA (Non-Hon) {{ avgGPA }}
+                </v-chip>
+                <v-chip class="font-weight-bold" color="blue-grey" :label="true">
+                  {{ filteredRows.length }} / {{ totalRows }} results
+                </v-chip>
+              </div>
+              <div class="results-active-state text-caption text-medium-emphasis">
+                <span v-if="hasActiveFilters">
+                  {{ activeFiltersCount }} active filters
+                </span>
+                <span v-else>
+                  No filters applied
+                </span>
+              </div>
+            </div>
+            <v-divider class="my-2"/>
+            <div class="results-filter-header d-flex align-center">
+              <span class="text-subtitle-2 font-weight-medium">Refine results</span>
+              <v-spacer/>
+              <v-btn v-if="hasActiveFilters"
+                     variant="text"
+                     density="compact"
+                     size="small"
+                     prepend-icon="pi pi-filter-slash"
+                     @click="clearAllTableFilters">
+                Clear filters
+              </v-btn>
+            </div>
+            <v-row no-gutters class="mt-1">
+              <v-col cols="12" sm="6" md="3" class="pr-sm-2 pb-2">
+                <v-text-field
+                    v-model="globalFilterText"
+                    label="Search all rows"
+                    placeholder="Search all values"
+                    color="primary"
+                    variant="outlined"
+                    hide-details="auto"
+                    density="compact"
+                    clearable
+                />
+              </v-col>
+              <v-col cols="12" sm="6" md="3" class="pl-sm-0 pr-sm-2 pb-2">
+                <v-text-field
+                    v-model="professorFilterText"
+                    label="Professor contains"
+                    placeholder="e.g., Smith"
+                    variant="outlined"
+                    color="primary"
+                    hide-details="auto"
+                    clearable
+                    density="compact"
+                />
+              </v-col>
+              <v-col cols="6" sm="3" md="2" class="pr-sm-2 pb-2">
+                <v-text-field
+                    v-model="gpaMinFilter"
+                    label="GPA min"
+                    placeholder="2.5"
+                    variant="outlined"
+                    color="primary"
+                    hide-details="auto"
+                    density="compact"
+                    type="number"
+                    step="0.01"
+                    :min="0"
+                    :max="4.5"
+                />
+              </v-col>
+              <v-col cols="6" sm="3" md="2" class="pr-sm-2 pb-2">
+                <v-text-field
+                    v-model="gpaMaxFilter"
+                    label="GPA max"
+                    placeholder="4.0"
+                    variant="outlined"
+                    color="primary"
+                    hide-details="auto"
+                    density="compact"
+                    type="number"
+                    step="0.01"
+                    :min="0"
+                    :max="4.5"
+                />
+              </v-col>
+              <v-col cols="12" sm="4" md="2" class="pb-2">
+                <v-switch
+                    v-model="honorsOnlyFilter"
+                    label="Honors only"
+                    color="amber"
+                    hide-details
+                    density="compact"
+                    inset
+                />
+              </v-col>
+            </v-row>
+          </div>
         </template>
-        <template #empty> No records found.</template>
+        <template #empty>
+          <v-sheet class="text-center text-medium-emphasis py-6 px-4">
+            <p class="text-body-1 mb-1">No matches found.</p>
+            <p class="text-caption">
+              Try clearing filters or using a broader search.
+            </p>
+          </v-sheet>
+        </template>
         <Column :sortable=true v-for="header of tableHeaders"
                 :field="header" :header="header" :showFilterMenu="false"
                 :style="header === 'Professor' ? 'min-width: 14rem' : ''">
           <template v-if="header === 'Professor'" #body="{ field, data }">
             <div :class="data['honors'] === true ? 'shimmer' : null">
               {{ data[field] }}
-            </div>
-          </template>
+          </div>
+        </template>
 
         </Column>
 
@@ -466,6 +650,36 @@ onBeforeUnmount(() => {
 .search-box::placeholder {
   background-color: whitesmoke;
   color: black;
+}
+
+.results-header-sheet {
+  background: transparent;
+}
+
+.results-summary-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+}
+
+.results-summary-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+
+.results-active-state {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.results-filter-header {
+  min-height: 28px;
 }
 
 .result-details-panel {
