@@ -16,6 +16,8 @@ export default {
       courseNumber,
       sortByOptions,
       sortByValue,
+      departmentSuggestions,
+      courseNumberSuggestions,
       tableData,
       tableHeaders,
       dataLoading,
@@ -23,6 +25,7 @@ export default {
       datasetMetadata,
       lastUpdatedText,
       loadDatasetMetadata,
+      loadCourseIndexMetadata,
       addSearchParams,
       clearValidationError,
       onSubmitButtonClick,
@@ -33,11 +36,11 @@ export default {
     watch(sortByValue, () => clearValidationError('sort_by'), {deep: true})
 
     function onCourseUpdate(nextValue) {
-      course.value = nextValue;
+      course.value = nextValue || '';
     }
 
     function onCourseNumberUpdate(nextValue) {
-      courseNumber.value = nextValue;
+      courseNumber.value = nextValue || '';
     }
 
     function onSortByUpdate(nextValue) {
@@ -50,6 +53,7 @@ export default {
 
     onMounted(async () => {
       await loadDatasetMetadata();
+      await loadCourseIndexMetadata();
       addSearchParams();
     })
 
@@ -58,6 +62,8 @@ export default {
       courseNumber,
       sortByOptions,
       sortByValue,
+      departmentSuggestions,
+      courseNumberSuggestions,
       tableData,
       tableHeaders,
       onSubmitButtonClick,
@@ -82,6 +88,8 @@ export default {
                 :course-number="courseNumber"
                 :sort-by-value="sortByValue"
                 :sort-by-options="sortByOptions"
+                :department-suggestions="departmentSuggestions"
+                :course-number-suggestions="courseNumberSuggestions"
                 :validation-errors="validationErrors"
                 @update:course="onCourseUpdate"
                 @update:courseNumber="onCourseNumberUpdate"

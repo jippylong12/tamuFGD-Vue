@@ -12,6 +12,7 @@ import {VSelect} from 'vuetify/components/VSelect'
 import {VBtn} from 'vuetify/components/VBtn'
 import {VChip} from 'vuetify/components/VChip'
 import {VTextField} from 'vuetify/components/VTextField'
+import {VAutocomplete} from 'vuetify/components/VAutocomplete'
 import PrimeVue from 'primevue/config';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
@@ -22,7 +23,7 @@ import "toastify-js/src/toastify.css"
 import * as directives from 'vuetify/directives'
 
 const vuetify = createVuetify({
-    components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn, VChip},
+    components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn, VChip, VAutocomplete},
     directives,
 })
 

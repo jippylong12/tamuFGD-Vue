@@ -1,4 +1,4 @@
-import {computed, ref} from 'vue'
+import {computed, ref, watch} from 'vue'
 import Toastify from 'toastify-js'
 
 export function useResultsQuery(axios) {
@@ -11,6 +11,8 @@ export function useResultsQuery(axios) {
     value: '2', title: 'Professor Last Name'
   }];
   const sortByValue = ref({value: '1', title: 'GPA'});
+  const departmentCatalog = ref([]);
+  const courseNumberCatalog = ref({});
 
   const tableData = ref([]);
   const tableHeaders = ref([]);
@@ -175,6 +177,112 @@ export function useResultsQuery(axios) {
       })
       .finally(() => {
         pruneOldQueryCacheEntries();
+      });
+  }
+
+  const departmentSuggestions = computed(() => {
+    const normalizedDepartment = (course.value || '').trim().toUpperCase();
+    if (!normalizedDepartment) {
+      return departmentCatalog.value;
+    }
+
+    return departmentCatalog.value.filter((nextDepartment) =>
+      nextDepartment.startsWith(normalizedDepartment)
+    );
+  });
+
+  const courseNumberSuggestions = computed(() => {
+    const normalizedDepartment = (course.value || '').trim().toUpperCase();
+    const allCourseNumbers = courseNumberCatalog.value[normalizedDepartment] || [];
+    const normalizedCourseNumber = (courseNumber.value || '').trim();
+
+    if (!normalizedCourseNumber) {
+      return allCourseNumbers;
+    }
+
+    return allCourseNumbers.filter((nextNumber) =>
+      nextNumber.startsWith(normalizedCourseNumber)
+    );
+  });
+
+  function normalizeDepartmentFromCourseCode(courseCode) {
+    return (courseCode || '').toUpperCase().trim();
+  }
+
+  function parseCourseCode(courseCode) {
+    const normalizedCourseCode = normalizeDepartmentFromCourseCode(courseCode);
+    const splitIndex = normalizedCourseCode.indexOf('-');
+    if (splitIndex < 1) {
+      return null;
+    }
+
+    const department = normalizedCourseCode.slice(0, splitIndex);
+    const courseNumber = normalizedCourseCode.slice(splitIndex + 1);
+    if (!/^[A-Z]{4}$/.test(department)) {
+      return null;
+    }
+    if (!/^\d{3,5}$/.test(courseNumber)) {
+      return null;
+    }
+
+    return {
+      department,
+      courseNumber,
+    };
+  }
+
+  function normalizeCourseNumbers(rawNumbers) {
+    return [...new Set(rawNumbers)].sort((left, right) =>
+      parseInt(left, 10) - parseInt(right, 10)
+    );
+  }
+
+  function buildCourseCatalog(coursesByCode) {
+    if (!coursesByCode || typeof coursesByCode !== 'object') {
+      departmentCatalog.value = [];
+      courseNumberCatalog.value = {};
+      return;
+    }
+
+    const departmentMap = {};
+    for (const [courseCode] of Object.entries(coursesByCode)) {
+      if (typeof courseCode !== 'string') {
+        continue;
+      }
+
+      const parsed = parseCourseCode(courseCode);
+      if (!parsed) {
+        continue;
+      }
+
+      const existing = departmentMap[parsed.department] || [];
+      existing.push(parsed.courseNumber);
+      departmentMap[parsed.department] = existing;
+    }
+
+    const nextDepartments = Object.keys(departmentMap).sort();
+    const nextCourseNumberCatalog = {};
+    for (const department of nextDepartments) {
+      nextCourseNumberCatalog[department] = normalizeCourseNumbers(departmentMap[department]);
+    }
+
+    departmentCatalog.value = nextDepartments;
+    courseNumberCatalog.value = nextCourseNumberCatalog;
+  }
+
+  function loadCourseIndexMetadata() {
+    return axios.get('/MasterDBs/MasterDB.index.json')
+      .then((response) => {
+        const payload = response && response.data;
+        if (!payload || typeof payload !== 'object') {
+          return;
+        }
+
+        buildCourseCatalog(payload.courses || {});
+      })
+      .catch(() => {
+        departmentCatalog.value = [];
+        courseNumberCatalog.value = {};
       });
   }
 
@@ -350,6 +458,17 @@ export function useResultsQuery(axios) {
     }
   }
 
+  watch(course, (nextCourseValue) => {
+    if (!nextCourseValue) {
+      return;
+    }
+
+    const normalizedCourse = normalizeDepartmentFromCourseCode(nextCourseValue);
+    if (normalizedCourse !== nextCourseValue) {
+      course.value = normalizedCourse;
+    }
+  });
+
   function clearValidationError(fieldName) {
     if (!validationErrors.value[fieldName]) {
       return;
@@ -363,6 +482,8 @@ export function useResultsQuery(axios) {
   return {
     course,
     courseNumber,
+    departmentSuggestions,
+    courseNumberSuggestions,
     sortByOptions,
     sortByValue,
     tableData,
@@ -372,6 +493,7 @@ export function useResultsQuery(axios) {
     datasetMetadata,
     lastUpdatedText,
     loadDatasetMetadata,
+    loadCourseIndexMetadata,
     addSearchParams,
     clearValidationError,
     onSubmitButtonClick,

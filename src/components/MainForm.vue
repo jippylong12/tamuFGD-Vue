@@ -16,6 +16,14 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  departmentSuggestions: {
+    type: Array,
+    default: () => ([]),
+  },
+  courseNumberSuggestions: {
+    type: Array,
+    default: () => ([]),
+  },
   validationErrors: {
     type: Object,
     default: () => ({}),
@@ -34,11 +42,11 @@ function onClickCourseNumber() {
 }
 
 function updateCourseValue(value) {
-  emits('update:course', value);
+  emits('update:course', value || '');
 }
 
 function updateCourseNumberValue(value) {
-  emits('update:courseNumber', value);
+  emits('update:courseNumber', value || '');
 }
 
 function onChangeSortBy(val) {
@@ -58,23 +66,30 @@ function onChangeSortBy(val) {
         <v-col cols="12" lg="6" class="pt-4">
           <v-row>
             <v-col cols="12" sm="6" class="py-0">
-              <v-text-field
+              <v-autocomplete
                   label="Department (Ex: CSCE)"
                   :model-value="course"
+                  :items="departmentSuggestions"
                   :error-messages="validationErrors.course"
                   @update:model-value="updateCourseValue"
                   @update:modelValue="updateCourseValue"
                   maxlength="4"
-                  @click="onClickCourse"></v-text-field>
+                  :clearable="false"
+                  :hide-no-data="false"
+                  @click="onClickCourse"></v-autocomplete>
             </v-col>
             <v-col cols="12" sm="6" class="py-0">
-              <v-text-field
+              <v-autocomplete
                   label="Course Number (Ex: 111)"
                   :error-messages="validationErrors.course_number"
                   :model-value="courseNumber"
+                  :items="courseNumberSuggestions"
                   @update:model-value="updateCourseNumberValue"
                   @update:modelValue="updateCourseNumberValue"
-                  @click="onClickCourseNumber"></v-text-field>
+                  maxlength="5"
+                  :clearable="false"
+                  :hide-no-data="false"
+                  @click="onClickCourseNumber"></v-autocomplete>
             </v-col>
             <v-col cols="12" sm="6" class="py-0">
               <v-select
