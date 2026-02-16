@@ -2,7 +2,32 @@
 import {FilterMatchMode, FilterOperator} from "primevue/api";
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
 
-const props = defineProps(['tableData', 'dataLoading', 'tableHeaders',])
+const props = defineProps({
+  tableData: {
+    required: true,
+    type: Array,
+  },
+  dataLoading: {
+    required: true,
+    type: Boolean,
+  },
+  tableHeaders: {
+    required: true,
+    type: Array,
+  },
+  initialFilterState: {
+    type: Object,
+    default: () => ({
+      globalFilter: null,
+      professorFilter: null,
+      gpaMinFilter: null,
+      gpaMaxFilter: null,
+      honorsOnlyFilter: false,
+    }),
+  },
+});
+
+const emit = defineEmits(['filter-state-changed'])
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
@@ -81,6 +106,13 @@ const honorsOnlyFilter = computed({
     filters.value.honors.value = nextValue ? true : null;
   },
 });
+const filterState = computed(() => ({
+  globalFilter: normalizeFilterText(filters.value.global.value),
+  professorFilter: normalizeFilterText(filters.value['Professor'].value),
+  gpaMinFilter: normalizeNumericFilter(filters.value['GPA'].constraints[0].value),
+  gpaMaxFilter: normalizeNumericFilter(filters.value['GPA'].constraints[1].value),
+  honorsOnlyFilter: filters.value.honors.value === true,
+}));
 const hasActiveFilters = computed(() => {
   return activeFiltersCount.value > 0;
 });
@@ -112,6 +144,25 @@ function normalizeFilterText(value) {
 
   const nextValue = value.trim();
   return nextValue || null;
+}
+
+function normalizeFilterState(nextFilterState) {
+  return {
+    globalFilter: normalizeFilterText(nextFilterState?.globalFilter),
+    professorFilter: normalizeFilterText(nextFilterState?.professorFilter),
+    gpaMinFilter: normalizeNumericFilter(nextFilterState?.gpaMinFilter),
+    gpaMaxFilter: normalizeNumericFilter(nextFilterState?.gpaMaxFilter),
+    honorsOnlyFilter: nextFilterState?.honorsOnlyFilter === true,
+  };
+}
+
+function applyInitialFilterState(nextFilterState) {
+  const nextFilters = normalizeFilterState(nextFilterState);
+  filters.value.global.value = nextFilters.globalFilter;
+  filters.value['Professor'].value = nextFilters.professorFilter;
+  filters.value['GPA'].constraints[0].value = nextFilters.gpaMinFilter;
+  filters.value['GPA'].constraints[1].value = nextFilters.gpaMaxFilter;
+  filters.value.honors.value = nextFilters.honorsOnlyFilter ? true : null;
 }
 
 function normalizeNumericFilter(value) {
@@ -476,6 +527,10 @@ function onFilter(event) {
   filteredRows.value = nextRows;
 }
 
+function emitFilterState() {
+  emit('filter-state-changed', filterState.value);
+}
+
 function syncFilteredRowsFromTransformedData() {
   filteredRows.value = transformedData.value;
 }
@@ -493,7 +548,15 @@ watch(() => props.tableData, () => {
   selectedRow.value = null;
   syncFilteredRowsFromTransformedData();
 }, {deep: true});
+watch(
+    () => props.initialFilterState,
+    (nextFilterState) => {
+      applyInitialFilterState(nextFilterState);
+    }, {deep: true}
+);
 watch(transformedData, syncFilteredRowsFromTransformedData, {immediate: true});
+watch(filters, emitFilterState, {deep: true});
+applyInitialFilterState(props.initialFilterState);
 
 onMounted(() => {
   panelState.value = readPanelState();

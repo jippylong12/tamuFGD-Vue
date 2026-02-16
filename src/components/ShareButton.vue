@@ -1,12 +1,59 @@
 <script setup>
 import Toastify from "toastify-js";
 
-const props = defineProps(['show', 'course', 'courseNumber', 'sortByValue'])
+const props = defineProps(['show', 'course', 'courseNumber', 'sortByValue', 'filterState'])
 defineEmits(['click'])
+
+function getTextFilter(value) {
+  if (typeof value !== 'string') {
+    return value || '';
+  }
+
+  return value.trim();
+}
+
+function isNumber(value) {
+  return typeof value === 'number' && Number.isFinite(value);
+}
+
+function buildShareUrl() {
+  const queryParams = new URLSearchParams();
+  const sortValue = props.sortByValue && props.sortByValue.value ? String(props.sortByValue.value) : '';
+  queryParams.set('course', props.course || '');
+  queryParams.set('number', props.courseNumber || '');
+  queryParams.set('sort_by', sortValue || '');
+
+  const nextFilterState = props.filterState || {};
+  const globalFilter = getTextFilter(nextFilterState.globalFilter);
+  if (globalFilter) {
+    queryParams.set('q', globalFilter);
+  }
+
+  const professorFilter = getTextFilter(nextFilterState.professorFilter);
+  if (professorFilter) {
+    queryParams.set('prof', professorFilter);
+  }
+
+  const gpaMinFilter = Number(nextFilterState.gpaMinFilter);
+  if (isNumber(gpaMinFilter)) {
+    queryParams.set('gpa_min', String(gpaMinFilter));
+  }
+
+  const gpaMaxFilter = Number(nextFilterState.gpaMaxFilter);
+  if (isNumber(gpaMaxFilter)) {
+    queryParams.set('gpa_max', String(gpaMaxFilter));
+  }
+
+  if (nextFilterState.honorsOnlyFilter === true) {
+    queryParams.set('honors', '1');
+  }
+
+  return `https://grades.jippylong12.xyz/?${queryParams.toString()}`;
+}
 
 async function pressedCopyButton() {
   showToast()
-  let currentUrl = `https://grades.jippylong12.xyz/?course=${props.course}&number=${props.courseNumber}&sort_by=${props.sortByValue.value}`;
+  const currentUrl = buildShareUrl();
   await navigator.clipboard.writeText(currentUrl);
 }
 

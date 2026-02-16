@@ -1,5 +1,5 @@
 <script>
-import {onMounted, watch} from 'vue'
+import {onMounted, ref, watch} from 'vue'
 import axios from 'axios';
 import MainForm from "@/components/MainForm.vue";
 import GeneralInfo from "@/components/GeneralInfo.vue";
@@ -11,6 +11,14 @@ import 'primeicons/primeicons.css';
 export default {
   components: {ResultsTable, ShareButton, GeneralInfo, MainForm},
   setup() {
+    const DEFAULT_FILTER_STATE = {
+      globalFilter: null,
+      professorFilter: null,
+      gpaMinFilter: null,
+      gpaMaxFilter: null,
+      honorsOnlyFilter: false,
+    };
+
     const {
       course,
       courseNumber,
@@ -31,6 +39,8 @@ export default {
       onSubmitButtonClick,
     } = useResultsQuery(axios);
 
+    const tableFilterState = ref({...DEFAULT_FILTER_STATE});
+
     watch(course, () => clearValidationError('course'))
     watch(courseNumber, () => clearValidationError('course_number'))
     watch(sortByValue, () => clearValidationError('sort_by'), {deep: true})
@@ -47,6 +57,63 @@ export default {
       sortByValue.value = nextValue;
     }
 
+    function normalizeFilterText(value) {
+      if (typeof value !== 'string') {
+        return null;
+      }
+
+      const trimmedValue = value.trim();
+      return trimmedValue || null;
+    }
+
+    function normalizeFilterNumber(value) {
+      if (value === null || value === undefined || value === '') {
+        return null;
+      }
+
+      const numericValue = Number(value);
+      if (!Number.isFinite(numericValue)) {
+        return null;
+      }
+
+      return numericValue;
+    }
+
+    function normalizeFilterBoolean(value) {
+      if (value === null || value === undefined) {
+        return false;
+      }
+
+      const normalizedValue = String(value).trim().toLowerCase();
+      return normalizedValue === '1' || normalizedValue === 'true' || normalizedValue === 'yes';
+    }
+
+    function getTableFilterStateFromUrl() {
+      const searchParams = new URLSearchParams(window.location.search);
+      return {
+        globalFilter: normalizeFilterText(searchParams.get('q')),
+        professorFilter: normalizeFilterText(searchParams.get('prof')),
+        gpaMinFilter: normalizeFilterNumber(searchParams.get('gpa_min')),
+        gpaMaxFilter: normalizeFilterNumber(searchParams.get('gpa_max')),
+        honorsOnlyFilter: normalizeFilterBoolean(searchParams.get('honors')),
+      };
+    }
+
+    function applyFilterState(nextFilterState) {
+      const nextState = nextFilterState || {};
+      tableFilterState.value = {
+        globalFilter: normalizeFilterText(nextState.globalFilter),
+        professorFilter: normalizeFilterText(nextState.professorFilter),
+        gpaMinFilter: normalizeFilterNumber(nextState.gpaMinFilter),
+        gpaMaxFilter: normalizeFilterNumber(nextState.gpaMaxFilter),
+        honorsOnlyFilter: !!nextState.honorsOnlyFilter,
+      };
+    }
+
+    function onResultsTableFilterChange(nextFilterState) {
+      applyFilterState(nextFilterState);
+    }
+
     function onSubmit() {
       onSubmitButtonClick();
     }
@@ -54,6 +121,10 @@ export default {
     onMounted(async () => {
       await loadDatasetMetadata();
       await loadCourseIndexMetadata();
+      applyFilterState({
+        ...DEFAULT_FILTER_STATE,
+        ...getTableFilterStateFromUrl(),
+      });
       addSearchParams();
     })
 
@@ -75,6 +146,8 @@ export default {
       validationErrors,
       datasetMetadata,
       lastUpdatedText,
+      tableFilterState,
+      onResultsTableFilterChange,
     }
   },
 }
@@ -102,7 +175,9 @@ export default {
         tableData,
         dataLoading,
         tableHeaders,
-      }"/>
+        initialFilterState: tableFilterState,
+      }"
+      @filter-state-changed="onResultsTableFilterChange"/>
 
       <v-row no-gutters v-if="!(tableData.length === 0 && !dataLoading)" class="mt-0 mb-4">
         <v-col cols="12" class="py-0">
@@ -115,6 +190,7 @@ export default {
         course,
         courseNumber,
         sortByValue,
+        filterState: tableFilterState,
       }"/>
       <v-row no-gutters v-if="lastUpdatedText">
         <v-col cols="12" class="text-center py-2">
