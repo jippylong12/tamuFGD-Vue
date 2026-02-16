@@ -103,6 +103,7 @@ const activeFiltersCount = computed(() => {
   }
   return nextCount;
 });
+const canExportFilteredRows = computed(() => filteredRows.value.length > 0 && !props.dataLoading);
 
 function normalizeFilterText(value) {
   if (typeof value !== 'string') {
@@ -124,6 +125,53 @@ function normalizeNumericFilter(value) {
   }
 
   return nextValue;
+}
+
+function buildExportCsvContent(rows, headers) {
+  const safeHeaders = Array.isArray(headers) ? headers : [];
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const csvHeader = safeHeaders.map((header) => formatCsvCell(header)).join(',');
+  const csvRows = safeRows.map((nextRow) => {
+    const rowMap = nextRow || {};
+    return safeHeaders.map((header) => formatCsvCell(rowMap[header])).join(',');
+  });
+
+  return [csvHeader, ...csvRows].join('\r\n');
+}
+
+function formatCsvCell(value) {
+  const normalizedValue = value == null ? '' : String(value);
+  if (/["\n\r,]/.test(normalizedValue)) {
+    return `"${normalizedValue.replace(/"/g, '""')}"`;
+  }
+
+  return normalizedValue;
+}
+
+function getExportFilename() {
+  const now = new Date();
+  const pad = (value) => String(value).padStart(2, '0');
+  const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}-${pad(now.getSeconds())}`;
+  return `fgd-results-${datePart}-${timePart}-filtered.csv`;
+}
+
+function exportFilteredRowsCsv() {
+  if (!canExportFilteredRows.value) {
+    return;
+  }
+
+  const csvContent = buildExportCsvContent(filteredRows.value, props.tableHeaders);
+  const blob = new Blob([`\uFEFF${csvContent}`], {type: 'text/csv;charset=utf-8;'});
+  const blobUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = blobUrl;
+  link.download = getExportFilename();
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(blobUrl);
 }
 
 const panelStorageKey = 'fgd-results-details-panel-state-v1';
@@ -501,18 +549,36 @@ onBeforeUnmount(() => {
                 </span>
               </div>
             </div>
-            <v-divider class="my-2"/>
+            <v-divider class="mt-4 mb-3"/>
             <div class="results-filter-header d-flex align-center">
               <span class="text-subtitle-2 font-weight-medium">Refine results</span>
               <v-spacer/>
-              <v-btn v-if="hasActiveFilters"
+              <div class="results-filter-actions d-flex align-center">
+                <span v-if="filteredRows.length > 0" class="results-filter-hint text-caption text-medium-emphasis">
+                  {{ filteredRows.length }} rows
+                </span>
+                <v-btn
+                    variant="outlined"
+                    density="comfortable"
+                    size="default"
+                    color="primary"
+                    prepend-icon="pi pi-file-excel"
+                    :disabled="!canExportFilteredRows"
+                    class="results-export-btn"
+                    @click="exportFilteredRowsCsv"
+                    aria-label="Export filtered results as CSV">
+                  Export CSV
+                </v-btn>
+                <v-btn v-if="hasActiveFilters"
                      variant="text"
-                     density="compact"
-                     size="small"
+                     density="comfortable"
+                     size="default"
+                     class="results-clear-btn"
                      prepend-icon="pi pi-filter-slash"
                      @click="clearAllTableFilters">
-                Clear filters
-              </v-btn>
+                  Clear filters
+                </v-btn>
+              </div>
             </div>
             <v-row no-gutters class="mt-1">
               <v-col cols="12" sm="6" md="3" class="pr-sm-2 pb-2">
@@ -523,7 +589,7 @@ onBeforeUnmount(() => {
                     color="primary"
                     variant="outlined"
                     hide-details="auto"
-                    density="compact"
+                    density="comfortable"
                     clearable
                 />
               </v-col>
@@ -535,8 +601,7 @@ onBeforeUnmount(() => {
                     variant="outlined"
                     color="primary"
                     hide-details="auto"
-                    clearable
-                    density="compact"
+                    density="comfortable"
                 />
               </v-col>
               <v-col cols="6" sm="3" md="2" class="pr-sm-2 pb-2">
@@ -547,7 +612,7 @@ onBeforeUnmount(() => {
                     variant="outlined"
                     color="primary"
                     hide-details="auto"
-                    density="compact"
+                    density="comfortable"
                     type="number"
                     step="0.01"
                     :min="0"
@@ -562,7 +627,7 @@ onBeforeUnmount(() => {
                     variant="outlined"
                     color="primary"
                     hide-details="auto"
-                    density="compact"
+                    density="comfortable"
                     type="number"
                     step="0.01"
                     :min="0"
@@ -575,7 +640,7 @@ onBeforeUnmount(() => {
                     label="Honors only"
                     color="amber"
                     hide-details
-                    density="compact"
+                    density="comfortable"
                     inset
                 />
               </v-col>
@@ -660,8 +725,9 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 8px 12px;
+  gap: 10px 16px;
   flex-wrap: wrap;
+  padding-bottom: 2px;
 }
 
 .results-summary-chips {
@@ -678,8 +744,31 @@ onBeforeUnmount(() => {
   white-space: nowrap;
 }
 
+.results-filter-actions {
+  gap: 8px;
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.results-export-btn {
+  border-width: 2px;
+  min-width: 132px;
+}
+
+.results-clear-btn {
+  min-height: 40px;
+}
+
+.results-filter-hint {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.1;
+  margin-right: 2px;
+}
+
 .results-filter-header {
-  min-height: 28px;
+  min-height: 42px;
+  gap: 10px;
 }
 
 .result-details-panel {
