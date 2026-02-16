@@ -33,9 +33,18 @@ function onClickCourseNumber() {
   gtag('event', 'clicked_course_number');
 }
 
+function updateCourseValue(value) {
+  emits('update:course', value);
+}
+
+function updateCourseNumberValue(value) {
+  emits('update:courseNumber', value);
+}
+
 function onChangeSortBy(val) {
   gtag('event', 'clicked_sort_by');
-  emits('update:sortByValue', props.sortByOptions.find((a) => a.value === val));
+  const nextSortBy = props.sortByOptions.find((a) => a.value === val);
+  emits('update:sortByValue', nextSortBy);
 }
 </script>
 
@@ -48,12 +57,13 @@ function onChangeSortBy(val) {
         </v-col>
         <v-col cols="12" lg="6" class="pt-4">
           <v-row>
-          <v-col cols="12" sm="6" class="py-0">
+            <v-col cols="12" sm="6" class="py-0">
               <v-text-field
                   label="Department (Ex: CSCE)"
-                  :value="course"
+                  :model-value="course"
                   :error-messages="validationErrors.course"
-                  @input="$emit('update:course', $event.target.value)"
+                  @update:model-value="updateCourseValue"
+                  @update:modelValue="updateCourseValue"
                   maxlength="4"
                   @click="onClickCourse"></v-text-field>
             </v-col>
@@ -61,8 +71,9 @@ function onChangeSortBy(val) {
               <v-text-field
                   label="Course Number (Ex: 111)"
                   :error-messages="validationErrors.course_number"
-                  :input="courseNumber"
-                  @input="$emit('update:courseNumber', $event.target.value)"
+                  :model-value="courseNumber"
+                  @update:model-value="updateCourseNumberValue"
+                  @update:modelValue="updateCourseNumberValue"
                   @click="onClickCourseNumber"></v-text-field>
             </v-col>
             <v-col cols="12" sm="6" class="py-0">

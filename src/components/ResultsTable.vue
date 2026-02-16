@@ -1,25 +1,16 @@
 <script setup>
 import {FilterMatchMode} from "primevue/api";
-import {ref, onUpdated} from "vue";
+import {computed, ref} from "vue";
 
 const props = defineProps(['tableData', 'dataLoading', 'tableHeaders',])
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   'Professor': {value: null, matchMode: FilterMatchMode.CONTAINS},
 });
-let transformedData = transformData();
-let highestGPA = getHighestGPA(transformedData);
-let lowestGPA = getLowestGPA(transformedData);
-let avgGPA = getAverageGPA(transformedData);
-
-onUpdated(() => {
-  if(props.dataLoading){
-    transformedData = transformData();
-    highestGPA = getHighestGPA(transformedData);
-    lowestGPA = getLowestGPA(transformedData);
-    avgGPA = getAverageGPA(transformedData);
-  }
-})
+const transformedData = computed(() => transformData());
+const highestGPA = computed(() => getHighestGPA(transformedData.value));
+const lowestGPA = computed(() => getLowestGPA(transformedData.value));
+const avgGPA = computed(() => getAverageGPA(transformedData.value));
 
 function determineRowClass(row) {
   if (row.honors) {
@@ -53,6 +44,10 @@ function getLowestGPA(data) {
 
 function getAverageGPA(data) {
   const nonHonorResults = data.filter(prof => !prof.honors);
+  if (nonHonorResults.length === 0) {
+    return '0.00';
+  }
+
   const averageGPA = nonHonorResults
       .map((professor) => parseFloat(professor.GPA))
       .reduce((accumulator, currentValue) => accumulator + currentValue, 0) / nonHonorResults.length;
@@ -62,19 +57,24 @@ function getAverageGPA(data) {
 
 // turn from array to Objects with headers matching key
 function transformData() {
-  return props.tableData.map((row, index) => {
+  const headers = props.tableHeaders || [];
+  return (props.tableData || []).map((row) => {
     const obj = {};
-    for (let i = 0; i < props.tableHeaders.length; i++) {
+    const rowValues = Array.isArray(row) ? [...row] : [];
+    for (let i = 0; i < headers.length; i++) {
+      const originalValue = rowValues[i] || '';
+      let value = originalValue;
+
       if (i === 0) {
-        if (row[i].includes("*")) {
-          row[i] = row[i].replace("*", "");
+        if (typeof value === 'string' && value.includes("*")) {
+          value = value.replace("*", "");
           obj['honors'] = true;
         } else {
           obj['honors'] = false;
         }
-        row[i] = titleCase(row[i]);
+        value = titleCase(value);
       }
-      obj[props.tableHeaders[i]] = row[i];
+      obj[headers[i]] = value;
     }
     return obj;
   });

@@ -1,233 +1,58 @@
 <script>
-import {computed, onMounted, ref, watch} from 'vue'
+import {onMounted, watch} from 'vue'
 import axios from 'axios';
-import Toastify from 'toastify-js'
 import MainForm from "@/components/MainForm.vue";
 import GeneralInfo from "@/components/GeneralInfo.vue";
 import ShareButton from "@/components/ShareButton.vue";
 import ResultsTable from "@/components/ResultsTable.vue";
+import { useResultsQuery } from '@/composables/useResultsQuery.js';
 import 'primeicons/primeicons.css';
 
 export default {
   components: {ResultsTable, ShareButton, GeneralInfo, MainForm},
   setup() {
-    const course = ref('')
-    const courseNumber = ref('')
-    const sortByOptions = [{value: '1', title: 'GPA'}, {
-      value: '2', title: 'Professor Last Name'
-    }];
-    const sortByValue = ref({value: '1', title: 'GPA'});
+    const {
+      course,
+      courseNumber,
+      sortByOptions,
+      sortByValue,
+      tableData,
+      tableHeaders,
+      dataLoading,
+      validationErrors,
+      datasetMetadata,
+      lastUpdatedText,
+      loadDatasetMetadata,
+      addSearchParams,
+      clearValidationError,
+      onSubmitButtonClick,
+    } = useResultsQuery(axios);
 
+    watch(course, () => clearValidationError('course'))
+    watch(courseNumber, () => clearValidationError('course_number'))
+    watch(sortByValue, () => clearValidationError('sort_by'), {deep: true})
 
-    let tableData = ref([]);
-    let tableHeaders = ref([]);
-    let dataLoading = ref(false);
-    const validationErrors = ref({});
-    const serverMessage = ref('');
-    const datasetMetadata = ref({});
-    const lastUpdatedText = computed(() => {
-      const raw = datasetMetadata.value?.generated_at;
-      if (!raw) {
-        return '';
-      }
-
-      const parsed = new Date(raw);
-      if (Number.isNaN(parsed.getTime())) {
-        return '';
-      }
-
-      return `Last updated: ${parsed.toLocaleString()}`;
-    });
-
-    window.dataLayer = window.dataLayer || [];
-
-    function gtag() {
-      dataLayer.push(arguments);
+    function onCourseUpdate(nextValue) {
+      course.value = nextValue;
     }
 
-    gtag('js', new Date());
-
-    gtag('config', 'G-B24WEF5K6V');
-
-    function showToast(message) {
-      Toastify({
-        text: message,
-        duration: 2000,
-        gravity: "bottom", // `top` or `bottom`
-        position: "center", // `left`, `center` or `right`
-        stopOnFocus: false, // Prevents dismissing of toast on hover
-        style: {
-          background: 'red'
-        },
-        className: "error",
-      }).showToast();
+    function onCourseNumberUpdate(nextValue) {
+      courseNumber.value = nextValue;
     }
 
-    const makePostRequest = async () => {
-      const formData = {
-        course: course.value.trim().toUpperCase(),
-        course_number: courseNumber.value.trim(),
-        sort_by: sortByValue.value['value'],
-      }
-      const url = 'results.php'
-      const response = await axios.post(url, formData);
-      const data = response.data || {};
-
-      if (response.status === 200 && data.success) {
-        tableHeaders.value = data.headers;
-        tableData.value = data.results;
-        serverMessage.value = '';
-        return;
-      }
-
-      applyBackendValidationErrors(data);
-      if (data.error_code === 'NO_RESULTS') {
-        tableHeaders.value = [];
-        tableData.value = [];
-        serverMessage.value = data.message || 'No results were found for this request.';
-        return;
-      }
-
-      serverMessage.value = data.message || 'Request failed.';
-      throw new Error(serverMessage.value);
-    };
-
-    const loadDatasetMetadata = async () => {
-      try {
-        const response = await axios.get('/MasterDBs/MasterDB.meta.json');
-        if (response && response.data) {
-          datasetMetadata.value = response.data;
-        } else {
-          datasetMetadata.value = {};
-        }
-      } catch {
-        datasetMetadata.value = {};
-      }
+    function onSortByUpdate(nextValue) {
+      sortByValue.value = nextValue;
     }
 
-    function addSearchParams() {
-      const searchParams = new URLSearchParams(window.location.search);
-      course.value = searchParams.get("course") || '';
-      courseNumber.value = searchParams.get("number") || '';
-      let sortByParamValue = searchParams.get("sort_by")
-      if (sortByParamValue) {
-        let sortVal = sortByOptions.find((a) => a.value === sortByParamValue)
-        if (sortVal) {
-          sortByValue.value = sortVal
-        }
-      }
-
-      if (course.value && courseNumber.value) {
-        onSubmitButtonClick();
-      }
+    function onSubmit() {
+      onSubmitButtonClick();
     }
 
-    function runClientValidation() {
-      const nextErrors = {};
-      const normalizedCourse = (course.value || '').trim();
-      const normalizedCourseNumber = (courseNumber.value || '').trim();
-      const numberValue = parseInt(normalizedCourseNumber, 10);
-
-      if (!/^[A-Za-z]{4}$/.test(normalizedCourse)) {
-        nextErrors.course = 'Department must be exactly 4 letters (A-Z).';
-      }
-
-      if (normalizedCourseNumber === '' || !/^\d+$/.test(normalizedCourseNumber) || numberValue < 100 || numberValue > 10000) {
-        nextErrors.course_number = 'Course number must be a number between 100 and 10000.';
-      }
-
-      validationErrors.value = nextErrors;
-      return Object.keys(nextErrors).length === 0;
-    }
-
-    function applyBackendValidationErrors(responseData) {
-      const nextErrors = {};
-      if (!responseData || !Array.isArray(responseData.errors)) {
-        validationErrors.value = {};
-        return;
-      }
-
-      for (const validationError of responseData.errors) {
-        if (!validationError || !validationError.field || !validationError.message) {
-          continue;
-        }
-        nextErrors[validationError.field] = validationError.message;
-      }
-
-      validationErrors.value = nextErrors;
-    }
-
-    function onSubmitButtonClick() {
-      const isValid = runClientValidation();
-      if (!isValid) {
-        return;
-      }
-
-      dataLoading.value = true;
-      serverMessage.value = '';
-      validationErrors.value = {};
-
-      gtag('event', 'clicked_submit_btn', {
-        course: course.value,
-        course_number: courseNumber.value,
-        sort_by: sortByValue.value['title'],
-      });
-      makePostRequest().then(() => {
-        dataLoading.value = false;
-      }).catch((error) => {
-        console.log(error);
-        dataLoading.value = false;
-        if (!serverMessage.value) {
-          serverMessage.value = 'Something went wrong! Please check form values.';
-        }
-
-        if (error.response && error.response.status === 400 && error.response.data) {
-          applyBackendValidationErrors(error.response.data);
-          serverMessage.value = error.response.data.message || serverMessage.value;
-        }
-
-        if (error.response && error.response.status === 404 && error.response.data && error.response.data.error_code === 'NO_RESULTS') {
-          tableData.value = [];
-          tableHeaders.value = [];
-          serverMessage.value = error.response.data.message || serverMessage.value;
-        }
-
-        if (serverMessage.value) {
-          showToast(serverMessage.value);
-        }
-      })
-    }
-
-    onMounted(() => {
-      loadDatasetMetadata();
+    onMounted(async () => {
+      await loadDatasetMetadata();
       addSearchParams();
     })
 
-    watch(course, () => {
-      if (validationErrors.value.course) {
-        const currentErrors = {...validationErrors.value};
-        delete currentErrors.course;
-        validationErrors.value = currentErrors;
-      }
-    })
-
-    watch(courseNumber, () => {
-      if (validationErrors.value.course_number) {
-        const currentErrors = {...validationErrors.value};
-        delete currentErrors.course_number;
-        validationErrors.value = currentErrors;
-      }
-    })
-
-    watch(sortByValue, () => {
-      if (validationErrors.value.sort_by) {
-        const currentErrors = {...validationErrors.value};
-        delete currentErrors.sort_by;
-        validationErrors.value = currentErrors;
-      }
-    }, {deep: true})
-
-    // expose the ref to the template
     return {
       course,
       courseNumber,
@@ -236,6 +61,10 @@ export default {
       tableData,
       tableHeaders,
       onSubmitButtonClick,
+      onCourseUpdate,
+      onCourseNumberUpdate,
+      onSortByUpdate,
+      onSubmit,
       dataLoading,
       validationErrors,
       datasetMetadata,
@@ -249,11 +78,15 @@ export default {
     <v-container :fluid=true class="pa-1">
       <h1 class="title"> TAMU Free Grade Distribution</h1>
 
-      <MainForm v-model:course="course" v-model:course-number="courseNumber"
-                v-model:sort-by-value="sortByValue"
-                :sort-by-options=sortByOptions
+      <MainForm :course="course"
+                :course-number="courseNumber"
+                :sort-by-value="sortByValue"
+                :sort-by-options="sortByOptions"
                 :validation-errors="validationErrors"
-                @submit-btn-click="onSubmitButtonClick"/>
+                @update:course="onCourseUpdate"
+                @update:courseNumber="onCourseNumberUpdate"
+                @update:sortByValue="onSortByUpdate"
+                @submit-btn-click="onSubmit"/>
       <GeneralInfo :show="tableData.length === 0 && !dataLoading"
                   :dataset-metadata="datasetMetadata"/>
 
