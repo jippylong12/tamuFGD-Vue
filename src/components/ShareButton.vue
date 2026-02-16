@@ -12,8 +12,17 @@ function getTextFilter(value) {
   return value.trim();
 }
 
-function isNumber(value) {
-  return typeof value === 'number' && Number.isFinite(value);
+function normalizeNumber(value) {
+  if (value === null || value === undefined || value === '') {
+    return null;
+  }
+
+  const nextValue = Number(value);
+  if (!Number.isFinite(nextValue)) {
+    return null;
+  }
+
+  return nextValue;
 }
 
 function buildShareUrl() {
@@ -34,13 +43,13 @@ function buildShareUrl() {
     queryParams.set('prof', professorFilter);
   }
 
-  const gpaMinFilter = Number(nextFilterState.gpaMinFilter);
-  if (isNumber(gpaMinFilter)) {
+  const gpaMinFilter = normalizeNumber(nextFilterState.gpaMinFilter);
+  if (gpaMinFilter !== null) {
     queryParams.set('gpa_min', String(gpaMinFilter));
   }
 
-  const gpaMaxFilter = Number(nextFilterState.gpaMaxFilter);
-  if (isNumber(gpaMaxFilter)) {
+  const gpaMaxFilter = normalizeNumber(nextFilterState.gpaMaxFilter);
+  if (gpaMaxFilter !== null) {
     queryParams.set('gpa_max', String(gpaMaxFilter));
   }
 
