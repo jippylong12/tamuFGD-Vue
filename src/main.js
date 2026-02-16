@@ -21,7 +21,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Paginator from "primevue/paginator";
 import InputText from "primevue/inputtext";
-import "primevue/resources/themes/lara-light-indigo/theme.css";
+import "primevue/resources/themes/lara-light-teal/theme.css";
 import "toastify-js/src/toastify.css"
 import * as directives from 'vuetify/directives'
 

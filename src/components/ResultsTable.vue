@@ -575,35 +575,52 @@ onBeforeUnmount(() => {
 
 </script>
 <template>
-  <v-row v-if="transformedData.length > 0 || dataLoading" class="px-4">
-    <v-col cols="12">
-      <DataTable :loading="dataLoading" :rowClass="determineRowClass"
-                 v-model:selection="selectedRow"
-                 selectionMode="single"
-                 :value="transformedData"
-                 paginator :rows="12" :rowsPerPageOptions="[12, 25, 50]"
-                 tableStyle="min-width: 50rem"
-                 filterDisplay="row" v-model:filters="filters"
-                 :globalFilterFields="tableHeaders"
-                 @filter="onFilter">
+  <v-row v-if="transformedData.length > 0 || dataLoading" class="results-shell px-4 px-sm-6 pb-5">
+    <v-col cols="12" class="pt-4">
+      <DataTable
+        class="results-table"
+        :loading="dataLoading"
+        :rowClass="determineRowClass"
+        v-model:selection="selectedRow"
+        selectionMode="single"
+        :value="transformedData"
+        paginator
+        :rows="12"
+        :rowsPerPageOptions="[12, 25, 50]"
+        tableStyle="min-width: 50rem"
+        responsiveLayout="scroll"
+        filterDisplay="row"
+        v-model:filters="filters"
+        :globalFilterFields="tableHeaders"
+        @filter="onFilter"
+      >
         <template #header>
-          <div class="results-header-sheet pa-3">
-            <div class="results-summary-row">
-              <div class="results-summary-chips d-flex flex-wrap align-center">
-                <v-chip class="font-weight-bold" color="green" text-color="white" :label="true">
-                  Highest GPA 🎓 {{ highestGPA['Professor'] }} - {{ highestGPA['GPA'] }}
-                </v-chip>
-                <v-chip class="font-weight-bold" color="red" text-color="white" :label="true">
-                  Lowest GPA 😔 {{ lowestGPA['Professor'] }} - {{ lowestGPA['GPA'] }}
-                </v-chip>
-                <v-chip class="font-weight-bold" color="blue" :label="true">
-                  Avg. GPA (Non-Hon) {{ avgGPA }}
-                </v-chip>
-                <v-chip class="font-weight-bold" color="blue-grey" :label="true">
-                  {{ filteredRows.length }} / {{ totalRows }} results
-                </v-chip>
-              </div>
-              <div class="results-active-state text-caption text-medium-emphasis">
+          <div class="results-header-sheet pa-2 pa-sm-3">
+            <div class="results-summary-grid">
+              <article class="summary-card summary-positive">
+                <p class="summary-label">Highest GPA</p>
+                <p class="summary-value">{{ highestGPA['GPA'] || 'N/A' }}</p>
+                <p class="summary-detail">{{ highestGPA['Professor'] || 'No professor loaded' }}</p>
+              </article>
+              <article class="summary-card summary-warning">
+                <p class="summary-label">Lowest GPA</p>
+                <p class="summary-value">{{ lowestGPA['GPA'] || 'N/A' }}</p>
+                <p class="summary-detail">{{ lowestGPA['Professor'] || 'No professor loaded' }}</p>
+              </article>
+              <article class="summary-card summary-neutral">
+                <p class="summary-label">Average GPA</p>
+                <p class="summary-value">{{ avgGPA }}</p>
+                <p class="summary-detail">Non-honors sections only</p>
+              </article>
+              <article class="summary-card summary-neutral">
+                <p class="summary-label">Visible Results</p>
+                <p class="summary-value">{{ filteredRows.length }} / {{ totalRows }}</p>
+                <p class="summary-detail">Current filter output</p>
+              </article>
+            </div>
+
+            <div class="results-toolbar">
+              <div class="results-active-state text-caption">
                 <span v-if="hasActiveFilters">
                   {{ activeFiltersCount }} active filters
                 </span>
@@ -611,143 +628,149 @@ onBeforeUnmount(() => {
                   No filters applied
                 </span>
               </div>
-            </div>
-            <v-divider class="mt-4 mb-3"/>
-            <div class="results-filter-header d-flex align-center">
-              <span class="text-subtitle-2 font-weight-medium">Refine results</span>
-              <v-spacer/>
               <div class="results-filter-actions d-flex align-center">
-                <span v-if="filteredRows.length > 0" class="results-filter-hint text-caption text-medium-emphasis">
-                  {{ filteredRows.length }} rows
-                </span>
                 <v-btn
-                    variant="outlined"
-                    density="comfortable"
-                    size="default"
-                    color="primary"
-                    prepend-icon="pi pi-file-excel"
-                    :disabled="!canExportFilteredRows"
-                    class="results-export-btn"
-                    @click="exportFilteredRowsCsv"
-                    aria-label="Export filtered results as CSV">
+                  variant="outlined"
+                  density="comfortable"
+                  color="primary"
+                  prepend-icon="pi pi-file-excel"
+                  :disabled="!canExportFilteredRows"
+                  class="results-export-btn"
+                  @click="exportFilteredRowsCsv"
+                  aria-label="Export filtered results as CSV"
+                >
                   Export CSV
                 </v-btn>
-                <v-btn v-if="hasActiveFilters"
-                     variant="text"
-                     density="comfortable"
-                     size="default"
-                     class="results-clear-btn"
-                     prepend-icon="pi pi-filter-slash"
-                     @click="clearAllTableFilters">
+                <v-btn
+                  v-if="hasActiveFilters"
+                  variant="text"
+                  density="comfortable"
+                  class="results-clear-btn"
+                  prepend-icon="pi pi-filter-slash"
+                  @click="clearAllTableFilters"
+                >
                   Clear filters
                 </v-btn>
               </div>
             </div>
-            <v-row no-gutters class="mt-1">
+            <p class="results-row-hint">Tip: select a row to open professor details in a movable panel.</p>
+
+            <v-row no-gutters class="mt-2">
               <v-col cols="12" sm="6" md="3" class="pr-sm-2 pb-2">
                 <v-text-field
-                    v-model="globalFilterText"
-                    label="Search all rows"
-                    placeholder="Search all values"
-                    color="primary"
-                    variant="outlined"
-                    hide-details="auto"
-                    density="comfortable"
-                    clearable
+                  v-model="globalFilterText"
+                  label="Search all rows"
+                  placeholder="Professor, GPA, percentages"
+                  color="primary"
+                  variant="outlined"
+                  hide-details="auto"
+                  density="comfortable"
+                  clearable
                 />
               </v-col>
               <v-col cols="12" sm="6" md="3" class="pl-sm-0 pr-sm-2 pb-2">
                 <v-text-field
-                    v-model="professorFilterText"
-                    label="Professor contains"
-                    placeholder="e.g., Smith"
-                    variant="outlined"
-                    color="primary"
-                    hide-details="auto"
-                    density="comfortable"
+                  v-model="professorFilterText"
+                  label="Professor name"
+                  placeholder="e.g., Smith"
+                  variant="outlined"
+                  color="primary"
+                  hide-details="auto"
+                  density="comfortable"
                 />
               </v-col>
               <v-col cols="6" sm="3" md="2" class="pr-sm-2 pb-2">
                 <v-text-field
-                    v-model="gpaMinFilter"
-                    label="GPA min"
-                    placeholder="2.5"
-                    variant="outlined"
-                    color="primary"
-                    hide-details="auto"
-                    density="comfortable"
-                    type="number"
-                    step="0.01"
-                    :min="0"
-                    :max="4.5"
+                  v-model="gpaMinFilter"
+                  label="GPA min"
+                  placeholder="2.5"
+                  variant="outlined"
+                  color="primary"
+                  hide-details="auto"
+                  density="comfortable"
+                  type="number"
+                  step="0.01"
+                  :min="0"
+                  :max="4.5"
                 />
               </v-col>
               <v-col cols="6" sm="3" md="2" class="pr-sm-2 pb-2">
                 <v-text-field
-                    v-model="gpaMaxFilter"
-                    label="GPA max"
-                    placeholder="4.0"
-                    variant="outlined"
-                    color="primary"
-                    hide-details="auto"
-                    density="comfortable"
-                    type="number"
-                    step="0.01"
-                    :min="0"
-                    :max="4.5"
+                  v-model="gpaMaxFilter"
+                  label="GPA max"
+                  placeholder="4.0"
+                  variant="outlined"
+                  color="primary"
+                  hide-details="auto"
+                  density="comfortable"
+                  type="number"
+                  step="0.01"
+                  :min="0"
+                  :max="4.5"
                 />
               </v-col>
-              <v-col cols="12" sm="4" md="2" class="pb-2">
+              <v-col cols="12" sm="4" md="2" class="pb-2 d-flex align-center">
                 <v-switch
-                    v-model="honorsOnlyFilter"
-                    label="Honors only"
-                    color="amber"
-                    hide-details
-                    density="comfortable"
-                    inset
+                  v-model="honorsOnlyFilter"
+                  label="Honors only"
+                  color="amber"
+                  hide-details
+                  density="comfortable"
+                  inset
                 />
               </v-col>
             </v-row>
           </div>
         </template>
+
         <template #empty>
-          <v-sheet class="text-center text-medium-emphasis py-6 px-4">
-            <p class="text-body-1 mb-1">No matches found.</p>
-            <p class="text-caption">
-              Try clearing filters or using a broader search.
-            </p>
+          <v-sheet class="text-center text-medium-emphasis py-8 px-4 empty-state">
+            <p class="text-body-1 mb-1">No matching rows.</p>
+            <p class="text-caption">Try clearing filters or broadening your search.</p>
           </v-sheet>
         </template>
-        <Column :sortable=true v-for="header of tableHeaders"
-                :field="header" :header="header" :showFilterMenu="false"
-                :style="header === 'Professor' ? 'min-width: 14rem' : ''">
+
+        <Column
+          :sortable=true
+          v-for="header of tableHeaders"
+          :field="header"
+          :header="header"
+          :showFilterMenu="false"
+          :style="header === 'Professor' ? 'min-width: 14rem' : ''"
+        >
           <template v-if="header === 'Professor'" #body="{ field, data }">
             <div :class="data['honors'] === true ? 'shimmer' : null">
               {{ data[field] }}
-          </div>
-        </template>
-
+            </div>
+          </template>
         </Column>
-
       </DataTable>
     </v-col>
+
     <div v-if="selectedRow" class="result-details-panel" :style="panelStyle" @mousedown.stop>
       <div class="result-details-panel-header" @pointerdown="beginPanelDrag">
-        <span class="result-details-panel-title">
-          {{ selectedRow['Professor'] }} details
-        </span>
-        <button type="button" class="result-details-close" @pointerdown.stop.prevent @click.stop="closeDetailsPanel"
-                aria-label="Close details">
+        <div class="result-details-panel-headline">
+          <p class="panel-kicker">Professor Profile</p>
+          <span class="result-details-panel-title">{{ selectedRow['Professor'] }}</span>
+        </div>
+        <button
+          type="button"
+          class="result-details-close"
+          @pointerdown.stop.prevent
+          @click.stop="closeDetailsPanel"
+          aria-label="Close details"
+        >
           ×
         </button>
       </div>
 
       <div class="result-details-panel-content">
-        <p class="mb-0">
+        <p class="panel-metrics mb-0">
           GPA <b>{{ selectedRow['GPA'] }}</b> &nbsp;&nbsp;|&nbsp;&nbsp;
           Semesters: <b>{{ selectedRow['% of Semesters'] || 'N/A' }}</b>
         </p>
-        <p class="text-body-2 mt-2 mb-2">Grade distribution:</p>
+        <p class="text-body-2 mt-2 mb-2">Grade distribution</p>
+
         <div class="grade-bars">
           <div class="grade-bar-row" v-for="bucket in selectedGradeBuckets" :key="bucket.key">
             <div class="grade-bar-label">{{ bucket.label }}</div>
@@ -758,59 +781,98 @@ onBeforeUnmount(() => {
             </div>
           </div>
         </div>
-        <div
-            class="details-resize-handle"
-            @pointerdown="beginPanelResize"
-        ></div>
+
+        <div class="details-resize-handle" @pointerdown="beginPanelResize"></div>
       </div>
     </div>
   </v-row>
-
 </template>
 
 <style scoped>
-
-.search-box {
-  color: black;
-  background-color: white;
+.results-shell {
+  position: relative;
 }
 
-.search-box::placeholder {
-  background-color: whitesmoke;
-  color: black;
+.results-table {
+  border-radius: 18px;
+  overflow: hidden;
 }
 
 .results-header-sheet {
   background: transparent;
+  display: grid;
+  gap: 14px;
 }
 
-.results-summary-row {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px 16px;
-  flex-wrap: wrap;
-  padding-bottom: 2px;
+.results-row-hint {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.83rem;
 }
 
-.results-summary-chips {
+.results-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.summary-card {
+  border: 1px solid rgb(20 29 36 / 12%);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 90%), rgb(250 249 246 / 82%));
+}
+
+.summary-label {
+  margin: 0;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+}
+
+.summary-value {
+  margin: 6px 0 2px;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.summary-detail {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.summary-positive {
+  border-top: 3px solid #2f7d5b;
+}
+
+.summary-warning {
+  border-top: 3px solid #b1543e;
+}
+
+.summary-neutral {
+  border-top: 3px solid #456883;
+}
+
+.results-toolbar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 10px;
   flex-wrap: wrap;
-  gap: 8px;
-  min-width: 0;
 }
 
 .results-active-state {
   display: inline-flex;
   align-items: center;
-  white-space: nowrap;
+  color: var(--text-secondary);
 }
 
 .results-filter-actions {
   gap: 8px;
-  flex-wrap: nowrap;
-  align-items: center;
+  flex-wrap: wrap;
 }
 
 .results-export-btn {
@@ -822,34 +884,23 @@ onBeforeUnmount(() => {
   min-height: 40px;
 }
 
-.results-filter-hint {
-  display: inline-flex;
-  align-items: center;
-  line-height: 1.1;
-  margin-right: 2px;
-}
-
-.results-filter-header {
-  min-height: 42px;
-  gap: 10px;
-}
-
 .result-details-panel {
   position: fixed;
   z-index: 1250;
-  border: 2px solid #cfcfcf;
-  border-radius: 10px;
+  border: 1px solid rgb(14 27 36 / 24%);
+  border-radius: 16px;
   padding: 12px 14px;
-  background: white;
-  box-shadow: 0 16px 30px rgb(0 0 0 / 18%);
+  background: rgb(247 248 249 / 97%);
+  box-shadow: 0 18px 36px rgb(10 13 16 / 25%);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  backdrop-filter: blur(3px);
 }
 
 .result-details-panel-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
   margin: 0 0 10px;
@@ -858,21 +909,34 @@ onBeforeUnmount(() => {
   touch-action: none;
 }
 
-.result-details-panel-title {
-  font-weight: 600;
-  color: #2a3b47;
+.result-details-panel-headline {
+  display: grid;
+  gap: 1px;
   flex: 1;
-  line-height: 1.2;
+}
+
+.panel-kicker {
+  margin: 0;
+  font-size: 0.69rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.result-details-panel-title {
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
 }
 
 .result-details-close {
-  border: none;
-  background: #ececec;
+  border: 1px solid rgb(14 27 36 / 12%);
+  background: rgb(255 255 255 / 88%);
   color: #334155;
-  width: 24px;
-  height: 24px;
+  width: 28px;
+  height: 28px;
   line-height: 1;
-  border-radius: 50%;
+  border-radius: 999px;
   cursor: pointer;
   font-size: 18px;
   font-weight: 700;
@@ -883,13 +947,22 @@ onBeforeUnmount(() => {
 }
 
 .result-details-close:hover {
-  background: #d8dbe0;
+  background: rgb(224 228 232 / 90%);
+}
+
+.result-details-close:focus-visible {
+  outline: 2px solid rgb(34 80 107 / 80%);
+  outline-offset: 2px;
 }
 
 .result-details-panel-content {
   position: relative;
   overflow: auto;
   flex: 1;
+}
+
+.panel-metrics {
+  color: var(--text-secondary);
 }
 
 .details-resize-handle {
@@ -902,8 +975,6 @@ onBeforeUnmount(() => {
   bottom: 4px;
   cursor: nwse-resize;
   opacity: 0.65;
-  transform-origin: center;
-  transform: rotate(0);
   touch-action: none;
 }
 
@@ -933,9 +1004,10 @@ onBeforeUnmount(() => {
 }
 
 .grade-bar-track {
-  min-height: 28px;
-  border: 1px solid #ddd;
-  background: #f7f7f7;
+  min-height: 30px;
+  border: 1px solid rgb(20 29 36 / 14%);
+  border-radius: 6px;
+  background: rgb(251 252 253 / 92%);
   overflow: hidden;
 }
 
@@ -944,9 +1016,88 @@ onBeforeUnmount(() => {
   min-width: 4%;
   color: white;
   font-size: 12px;
-  line-height: 26px;
+  line-height: 28px;
   padding-left: 8px;
   transition: width 220ms ease;
 }
 
+.empty-state {
+  border: 1px dashed rgb(20 29 36 / 22%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 70%);
+}
+
+:deep(.p-datatable-wrapper) {
+  border-radius: 14px;
+}
+
+:deep(.p-datatable-table) {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+:deep(.p-datatable-thead > tr > th) {
+  background: linear-gradient(120deg, #6a2332, #3c1a20);
+  color: #fff;
+  border: none;
+  text-align: center;
+  padding: 12px;
+}
+
+:deep(.p-column-header-content) {
+  justify-content: center;
+}
+
+:deep(.p-datatable-tbody > tr > td) {
+  border: none;
+  border-bottom: 1px solid rgb(20 29 36 / 8%);
+  text-align: center;
+  padding: 14px 12px;
+  background: rgb(255 255 255 / 92%);
+}
+
+:deep(.p-datatable-tbody > tr:hover > td) {
+  background: rgb(245 249 247 / 95%);
+}
+
+:deep(.p-datatable-tbody > tr.honors > td) {
+  background: linear-gradient(120deg, #8f7c3a, #705f2f);
+  color: #fff;
+}
+
+:deep(.p-paginator) {
+  border: none;
+  background: transparent;
+  padding-top: 12px;
+}
+
+:deep(.v-field) {
+  border-radius: 12px;
+  background: rgb(255 255 255 / 92%);
+}
+
+@media (max-width: 1090px) {
+  .results-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .results-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .results-toolbar {
+    align-items: flex-start;
+  }
+
+  .results-filter-actions {
+    width: 100%;
+  }
+
+  .results-export-btn,
+  .results-clear-btn {
+    flex: 1;
+  }
+}
 </style>

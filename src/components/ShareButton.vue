@@ -59,13 +59,13 @@ async function pressedCopyButton() {
 
 async function showToast() {
   Toastify({
-    text: "Copied!",
-    duration: 1000,
-    gravity: "bottom", // `top` or `bottom`
-    position: "center", // `left`, `center` or `right`
-    stopOnFocus: false, // Prevents dismissing of toast on hover
+    text: "Share link copied",
+    duration: 1200,
+    gravity: "bottom",
+    position: "center",
+    stopOnFocus: false,
     style: {
-      background: 'black'
+      background: '#17342d'
     },
     className: "info",
   }).showToast();
@@ -73,36 +73,50 @@ async function showToast() {
 
 </script>
 <template>
-  <div v-if="show" id="copy-url-button"
-       @click="pressedCopyButton">
+  <div v-if="show" class="share-button-shell" @click="pressedCopyButton">
     <button class="copy-url-button">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
            fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
         <path
-            d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
+          d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/>
       </svg>
-      <span class="ms-1">
-                Share
-            </span>
+      <span>Share View</span>
     </button>
   </div>
 </template>
 
 <style scoped>
-.copy-url-button {
+.share-button-shell {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background-color: #000;
+  bottom: 18px;
+  right: 18px;
+  z-index: 1200;
+}
+
+.copy-url-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgb(255 255 255 / 26%);
+  background: linear-gradient(120deg, #17342d, #672a35);
   color: #fff;
-  padding: 12px 20px;
-  border-radius: 32px;
+  padding: 11px 16px;
+  border-radius: 999px;
   cursor: pointer;
+  box-shadow: 0 14px 26px rgb(14 17 23 / 26%);
+  font-weight: 600;
 }
 
 @media (hover: hover) {
   .copy-url-button:hover {
-    background-color: #333;
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 700px) {
+  .copy-url-button {
+    padding: 10px 13px;
+    font-size: 0.88rem;
   }
 }
 </style>

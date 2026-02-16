@@ -137,14 +137,20 @@ function getMailtoUrl() {
 <template>
   <div v-if="show" class="report-issue-link">
     <a :href="getMailtoUrl()" class="feedback-link" rel="noopener noreferrer">
-      {{ isResultsContext ? 'Report issue with this result' : 'Report issue' }}
+      {{ isResultsContext ? 'Report an issue with this result set' : 'Report an issue' }}
     </a>
   </div>
 </template>
 
 <style scoped>
+.report-issue-link {
+  display: inline-flex;
+}
+
 .feedback-link {
-  color: #0d6efd;
+  color: var(--accent-dark);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .feedback-link:hover {

@@ -17,6 +17,7 @@ export function useResultsQuery(axios) {
   const tableData = ref([]);
   const tableHeaders = ref([]);
   const dataLoading = ref(false);
+  const hasSearched = ref(false);
   const validationErrors = ref({});
   const serverMessage = ref('');
   const datasetMetadata = ref({});
@@ -374,11 +375,16 @@ export function useResultsQuery(axios) {
   }
 
   function onSubmitButtonClick() {
+    if (dataLoading.value) {
+      return;
+    }
+
     const isValid = runClientValidation();
     if (!isValid) {
       return;
     }
 
+    hasSearched.value = true;
     const submitId = ++latestSubmitId;
     const cacheKey = makeCacheKey();
     const cachedPayload = loadQueryCache(cacheKey);
@@ -489,7 +495,9 @@ export function useResultsQuery(axios) {
     tableData,
     tableHeaders,
     dataLoading,
+    hasSearched,
     validationErrors,
+    serverMessage,
     datasetMetadata,
     lastUpdatedText,
     loadDatasetMetadata,

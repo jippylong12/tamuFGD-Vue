@@ -30,6 +30,10 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  dataLoading: {
+    type: Boolean,
+    default: false,
+  },
 })
 const emits = defineEmits(['update:course', 'update:courseNumber', 'update:sortByValue', 'submitBtnClick'])
 
@@ -37,11 +41,11 @@ const courseSearchValue = ref(props.course || '');
 const courseNumberSearchValue = ref(props.courseNumber || '');
 
 watch(
-    courseSearchValue,
-    (nextValue) => {
-      emits('update:course', (nextValue || '').toUpperCase());
-    },
-    {flush: 'sync'}
+  courseSearchValue,
+  (nextValue) => {
+    emits('update:course', (nextValue || '').toUpperCase());
+  },
+  {flush: 'sync'}
 );
 
 watch(
@@ -66,7 +70,9 @@ watch(() => props.courseNumber, (nextValue) => {
   }
 });
 
-function gtag(){dataLayer.push(arguments);}
+function gtag() {
+  dataLayer.push(arguments);
+}
 
 function onClickCourse() {
   gtag('event', 'clicked_course');
@@ -123,60 +129,162 @@ function onCourseNumberBlur() {
 </script>
 
 <template>
-  <v-row no-gutters>
-    <v-col cols="12" class="mt-2 px-4">
-      <v-row justify="center" no-gutters>
-        <v-col cols="12">
-          <p class="text-center text-h6">Enter the course information below and press submit. Golden rows are Honors only.</p>
+  <v-row no-gutters class="form-shell">
+    <v-col cols="12" class="form-intro px-4 px-sm-6 pt-5 pt-sm-6">
+      <p class="form-kicker">Search</p>
+      <h2 class="form-title">Build your schedule with cleaner data.</h2>
+      <p class="form-copy">
+        Enter a department and course number, then compare outcomes by GPA or professor name. Honors sections stay highlighted.
+      </p>
+      <p class="form-helper">Tip: press Enter after filling fields to run search quickly.</p>
+    </v-col>
+
+    <v-col cols="12" class="px-4 px-sm-6 pb-5 pb-sm-6">
+      <form class="form-submit" @submit.prevent="$emit('submitBtnClick')">
+      <v-row class="form-grid" no-gutters>
+        <v-col cols="12" sm="6" class="field-col pr-sm-2 pb-2">
+          <v-combobox
+            label="Department"
+            placeholder="CSCE"
+            :model-value="course"
+            v-model:search="courseSearchValue"
+            :items="departmentSuggestions"
+            :disabled="dataLoading"
+            :error-messages="validationErrors.course"
+            @update:model-value="updateCourseValue"
+            @update:modelValue="updateCourseValue"
+            @update:search="updateCourseSearchText"
+            @blur="onCourseBlur"
+            maxlength="4"
+            :clearable="false"
+            :hide-no-data="false"
+            @click="onClickCourse"
+          ></v-combobox>
         </v-col>
-        <v-col cols="12" lg="6" class="pt-4">
-          <v-row>
-            <v-col cols="12" sm="6" class="py-0">
-              <v-combobox
-                  label="Department (Ex: CSCE)"
-                  :model-value="course"
-                  v-model:search="courseSearchValue"
-                  :items="departmentSuggestions"
-                  :error-messages="validationErrors.course"
-                  @update:model-value="updateCourseValue"
-                  @update:modelValue="updateCourseValue"
-                  @update:search="updateCourseSearchText"
-                  @blur="onCourseBlur"
-                  maxlength="4"
-                  :clearable="false"
-                  :hide-no-data="false"
-                  @click="onClickCourse"></v-combobox>
-            </v-col>
-            <v-col cols="12" sm="6" class="py-0">
-              <v-combobox
-                  label="Course Number (Ex: 111)"
-                  :error-messages="validationErrors.course_number"
-                  :model-value="courseNumber"
-                  v-model:search="courseNumberSearchValue"
-                  :items="courseNumberSuggestions"
-                  @update:model-value="updateCourseNumberValue"
-                  @update:modelValue="updateCourseNumberValue"
-                  @update:search="updateCourseNumberSearchText"
-                  @blur="onCourseNumberBlur"
-                  maxlength="5"
-                  :clearable="false"
-                  :hide-no-data="false"
-                  @click="onClickCourseNumber"></v-combobox>
-            </v-col>
-            <v-col cols="12" sm="6" class="py-0">
-              <v-select
-                  label="Sort By:"
-                  :model-value="sortByValue"
-                  :items="sortByOptions"
-                  @update:modelValue="onChangeSortBy"
-              ></v-select>
-            </v-col>
-            <v-col cols="12" sm="6" align-self="start">
-              <v-btn color="black" :block=true @click="$emit('submitBtnClick')">Submit</v-btn>
-            </v-col>
-          </v-row>
+
+        <v-col cols="12" sm="6" class="field-col pl-sm-2 pb-2">
+          <v-combobox
+            label="Course Number"
+            placeholder="221"
+            :error-messages="validationErrors.course_number"
+            :model-value="courseNumber"
+            v-model:search="courseNumberSearchValue"
+            :items="courseNumberSuggestions"
+            :disabled="dataLoading"
+            @update:model-value="updateCourseNumberValue"
+            @update:modelValue="updateCourseNumberValue"
+            @update:search="updateCourseNumberSearchText"
+            @blur="onCourseNumberBlur"
+            maxlength="5"
+            :clearable="false"
+            :hide-no-data="false"
+            @click="onClickCourseNumber"
+          ></v-combobox>
+        </v-col>
+
+        <v-col cols="12" sm="6" class="field-col pr-sm-2 pb-2">
+          <v-select
+            label="Sort Results By"
+            :model-value="sortByValue"
+            :items="sortByOptions"
+            :disabled="dataLoading"
+            @update:modelValue="onChangeSortBy"
+          ></v-select>
+        </v-col>
+
+        <v-col cols="12" sm="6" class="field-col pl-sm-2 pb-2 d-flex align-end">
+          <v-btn class="submit-btn" :block=true :loading="dataLoading" :disabled="dataLoading" type="submit">
+            {{ dataLoading ? 'Loading Results...' : 'Show Results' }}
+          </v-btn>
         </v-col>
       </v-row>
+      </form>
     </v-col>
   </v-row>
 </template>
+
+<style scoped>
+.form-shell {
+  border-radius: inherit;
+}
+
+.form-intro {
+  border-bottom: 1px solid rgb(28 31 35 / 8%);
+}
+
+.form-kicker {
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.form-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.2vw, 2rem);
+  line-height: 1.15;
+  color: var(--text-primary);
+}
+
+.form-copy {
+  margin: 12px 0 0;
+  max-width: 760px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+.form-helper {
+  margin: 9px 0 0;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
+}
+
+.form-submit {
+  margin: 0;
+}
+
+.form-grid {
+  margin-top: 14px;
+}
+
+.submit-btn {
+  width: 100%;
+  min-height: 56px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border-radius: 14px;
+  background: linear-gradient(120deg, #17342d, #68232f);
+  color: #fff;
+  box-shadow: 0 14px 24px rgb(20 24 29 / 16%);
+}
+
+.submit-btn:hover {
+  transform: translateY(-1px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.78;
+}
+
+.submit-btn:focus-visible {
+  box-shadow: 0 0 0 3px rgb(45 120 161 / 30%), 0 14px 24px rgb(20 24 29 / 16%);
+}
+
+:deep(.v-field) {
+  border-radius: 14px;
+  background: rgb(252 252 252 / 90%);
+}
+
+:deep(.v-field__outline) {
+  color: rgb(28 31 35 / 20%);
+}
+
+@media (max-width: 760px) {
+  .submit-btn {
+    min-height: 52px;
+  }
+}
+</style>
