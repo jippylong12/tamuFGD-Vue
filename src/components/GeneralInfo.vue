@@ -1,12 +1,31 @@
 <script setup>
-defineProps(['show'])
+import {computed} from 'vue';
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    required: true,
+  },
+  datasetMetadata: {
+    type: Object,
+    default: () => ({}),
+  },
+});
+
+const termRangeText = computed(() => {
+  const termRange = props.datasetMetadata?.coverage?.term_range || props.datasetMetadata?.term_range;
+  if (termRange && termRange.start && termRange.end) {
+    return `Data from ${termRange.start} - ${termRange.end}`;
+  }
+  return 'Data from Spring 2012 - Summer 2023';
+});
 </script>
 
 <template>
   <v-row no-gutters v-if="show">
     <v-col cols="12" class="py-2">
       <h5 class="suggestion"><a href="https://www.jippylong12.xyz">👋🏽 Me</a></h5>
-      <h5 class="suggestion"> Data from Spring 2012 - Summer 2023</h5>
+      <h5 class="suggestion">{{ termRangeText }}</h5>
     </v-col>
 
     <v-col cols="12" class="px-4 pb-4">

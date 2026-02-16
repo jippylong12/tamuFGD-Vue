@@ -19,6 +19,10 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      '/MasterDBs': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
       '/favicon.ico': {
         target: 'http://localhost:8080',
         changeOrigin: true,

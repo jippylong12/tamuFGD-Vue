@@ -1,5 +1,5 @@
 <script>
-import {ref, watch} from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import axios from 'axios';
 import Toastify from 'toastify-js'
 import MainForm from "@/components/MainForm.vue";
@@ -14,8 +14,7 @@ export default {
     const course = ref('')
     const courseNumber = ref('')
     const sortByOptions = [{value: '1', title: 'GPA'}, {
-      value: '2',
-      title: 'Professor Last Name'
+      value: '2', title: 'Professor Last Name'
     }];
     const sortByValue = ref({value: '1', title: 'GPA'});
 
@@ -25,6 +24,20 @@ export default {
     let dataLoading = ref(false);
     const validationErrors = ref({});
     const serverMessage = ref('');
+    const datasetMetadata = ref({});
+    const lastUpdatedText = computed(() => {
+      const raw = datasetMetadata.value?.generated_at;
+      if (!raw) {
+        return '';
+      }
+
+      const parsed = new Date(raw);
+      if (Number.isNaN(parsed.getTime())) {
+        return '';
+      }
+
+      return `Last updated: ${parsed.toLocaleString()}`;
+    });
 
     window.dataLayer = window.dataLayer || [];
 
@@ -49,10 +62,6 @@ export default {
         className: "error",
       }).showToast();
     }
-
-    window.addEventListener('DOMContentLoaded', function () {
-      addSearchParams()
-    })
 
     const makePostRequest = async () => {
       const formData = {
@@ -82,6 +91,19 @@ export default {
       serverMessage.value = data.message || 'Request failed.';
       throw new Error(serverMessage.value);
     };
+
+    const loadDatasetMetadata = async () => {
+      try {
+        const response = await axios.get('/MasterDBs/MasterDB.meta.json');
+        if (response && response.data) {
+          datasetMetadata.value = response.data;
+        } else {
+          datasetMetadata.value = {};
+        }
+      } catch {
+        datasetMetadata.value = {};
+      }
+    }
 
     function addSearchParams() {
       const searchParams = new URLSearchParams(window.location.search);
@@ -176,6 +198,11 @@ export default {
       })
     }
 
+    onMounted(() => {
+      loadDatasetMetadata();
+      addSearchParams();
+    })
+
     watch(course, () => {
       if (validationErrors.value.course) {
         const currentErrors = {...validationErrors.value};
@@ -211,6 +238,8 @@ export default {
       onSubmitButtonClick,
       dataLoading,
       validationErrors,
+      datasetMetadata,
+      lastUpdatedText,
     }
   },
 }
@@ -225,7 +254,8 @@ export default {
                 :sort-by-options=sortByOptions
                 :validation-errors="validationErrors"
                 @submit-btn-click="onSubmitButtonClick"/>
-      <GeneralInfo :show="tableData.length === 0 && !dataLoading"/>
+      <GeneralInfo :show="tableData.length === 0 && !dataLoading"
+                  :dataset-metadata="datasetMetadata"/>
 
       <ResultsTable v-bind="{
         tableData,
@@ -245,6 +275,13 @@ export default {
         courseNumber,
         sortByValue,
       }"/>
+      <v-row no-gutters v-if="lastUpdatedText">
+        <v-col cols="12" class="text-center py-2">
+          <p class="text-caption">
+            {{ lastUpdatedText }}
+          </p>
+        </v-col>
+      </v-row>
     </v-container>
   </v-app>
 </template>
