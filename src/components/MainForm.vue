@@ -130,7 +130,7 @@ function onCourseNumberBlur() {
 
 <template>
   <v-row no-gutters class="form-shell">
-    <v-col cols="12" class="form-intro px-4 px-sm-6 pt-5 pt-sm-6">
+    <v-col cols="12" class="form-intro px-4 px-sm-5 pt-4 pt-sm-5">
       <p class="form-kicker">Search</p>
       <h2 class="form-title">Build your schedule with cleaner data.</h2>
       <p class="form-copy">
@@ -139,7 +139,7 @@ function onCourseNumberBlur() {
       <p class="form-helper">Tip: press Enter after filling fields to run search quickly.</p>
     </v-col>
 
-    <v-col cols="12" class="px-4 px-sm-6 pb-5 pb-sm-6">
+    <v-col cols="12" class="px-4 px-sm-5 pt-3 pt-sm-4 pb-4 pb-sm-5">
       <form class="form-submit" @submit.prevent="$emit('submitBtnClick')">
       <v-row class="form-grid" no-gutters>
         <v-col cols="12" sm="6" class="field-col pr-sm-2 pb-2">
@@ -192,8 +192,8 @@ function onCourseNumberBlur() {
           ></v-select>
         </v-col>
 
-        <v-col cols="12" sm="6" class="field-col pl-sm-2 pb-2 d-flex align-end">
-          <v-btn class="submit-btn" :block=true :loading="dataLoading" :disabled="dataLoading" type="submit">
+        <v-col cols="12" sm="6" class="field-col pl-sm-2 pb-2 submit-col">
+          <v-btn class="submit-btn" color="primary" variant="flat" :block=true :loading="dataLoading" :disabled="dataLoading" type="submit">
             {{ dataLoading ? 'Loading Results...' : 'Show Results' }}
           </v-btn>
         </v-col>
@@ -209,7 +209,9 @@ function onCourseNumberBlur() {
 }
 
 .form-intro {
-  border-bottom: 1px solid rgb(28 31 35 / 8%);
+  border-bottom: 1px solid rgb(80 0 0 / 20%);
+  padding-bottom: 14px;
+  margin-bottom: 6px;
 }
 
 .form-kicker {
@@ -230,14 +232,14 @@ function onCourseNumberBlur() {
 }
 
 .form-copy {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   max-width: 760px;
   color: var(--text-secondary);
   line-height: 1.5;
 }
 
 .form-helper {
-  margin: 9px 0 0;
+  margin: 6px 0 0;
   color: var(--text-secondary);
   font-size: 0.86rem;
 }
@@ -247,22 +249,37 @@ function onCourseNumberBlur() {
 }
 
 .form-grid {
-  margin-top: 14px;
+  margin-top: 10px;
+}
+
+.submit-col {
+  display: flex;
+  align-items: flex-start;
 }
 
 .submit-btn {
   width: 100%;
-  min-height: 56px;
+  min-height: 52px;
   font-weight: 700;
   letter-spacing: 0.01em;
-  border-radius: 14px;
-  background: linear-gradient(120deg, #17342d, #68232f);
+  text-transform: none !important;
+  font-size: 0.98rem;
+  border-radius: 12px;
+  border: 1px solid rgb(67 0 0 / 88%);
+  background: #500000 !important;
   color: #fff;
-  box-shadow: 0 14px 24px rgb(20 24 29 / 16%);
+  box-shadow: 0 2px 6px rgb(48 7 14 / 18%);
 }
 
 .submit-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(0);
+  background: #5b0c15 !important;
+  box-shadow: 0 3px 8px rgb(48 7 14 / 22%);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+  background: #430000 !important;
 }
 
 .submit-btn:disabled {
@@ -270,16 +287,22 @@ function onCourseNumberBlur() {
 }
 
 .submit-btn:focus-visible {
-  box-shadow: 0 0 0 3px rgb(45 120 161 / 30%), 0 14px 24px rgb(20 24 29 / 16%);
+  box-shadow: 0 0 0 3px rgb(92 31 41 / 32%), 0 3px 8px rgb(48 7 14 / 22%);
+}
+
+:deep(.submit-btn .v-btn__content) {
+  text-transform: none !important;
+  letter-spacing: 0.01em;
+  font-weight: 700;
 }
 
 :deep(.v-field) {
-  border-radius: 14px;
-  background: rgb(252 252 252 / 90%);
+  border-radius: 12px;
+  background: rgb(252 250 248 / 94%);
 }
 
 :deep(.v-field__outline) {
-  color: rgb(28 31 35 / 20%);
+  color: rgb(80 0 0 / 30%);
 }
 
 @media (max-width: 760px) {

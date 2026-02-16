@@ -8,15 +8,15 @@
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
-  --bg-top: #f6f2e8;
-  --bg-bottom: #d7dee0;
-  --surface-bg: rgb(255 255 255 / 86%);
-  --surface-border: rgb(19 27 35 / 14%);
-  --surface-shadow: 0 16px 36px rgb(21 29 37 / 12%);
-  --text-primary: #1b2530;
-  --text-secondary: #475463;
-  --accent-dark: #6a2332;
-  --focus-ring: 0 0 0 3px rgb(45 120 161 / 35%);
+  --bg-top: #f4efed;
+  --bg-bottom: #e4dfde;
+  --surface-bg: linear-gradient(165deg, rgb(252 250 249 / 95%), rgb(245 242 240 / 93%));
+  --surface-border: rgb(80 0 0 / 35%);
+  --surface-shadow: 0 14px 28px rgb(40 8 15 / 20%);
+  --text-primary: #2b0c14;
+  --text-secondary: #5d3943;
+  --accent-dark: #500000;
+  --focus-ring: 0 0 0 3px rgb(128 27 43 / 35%);
   --motion-fast: 180ms;
 }
 
@@ -35,10 +35,7 @@ body {
   font-family: var(--font-body);
   color: var(--text-primary);
   text-rendering: optimizeLegibility;
-  background:
-    radial-gradient(circle at 6% 5%, rgb(109 143 119 / 20%), transparent 30%),
-    radial-gradient(circle at 90% 94%, rgb(133 43 52 / 14%), transparent 36%),
-    linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+  background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
 }
 
 a {

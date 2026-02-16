@@ -575,8 +575,8 @@ onBeforeUnmount(() => {
 
 </script>
 <template>
-  <v-row v-if="transformedData.length > 0 || dataLoading" class="results-shell px-4 px-sm-6 pb-5">
-    <v-col cols="12" class="pt-4">
+  <v-row v-if="transformedData.length > 0 || dataLoading" class="results-shell px-3 px-sm-4 pb-4">
+    <v-col cols="12" class="pt-3">
       <DataTable
         class="results-table"
         :loading="dataLoading"
@@ -794,14 +794,14 @@ onBeforeUnmount(() => {
 }
 
 .results-table {
-  border-radius: 18px;
+  border-radius: 14px;
   overflow: hidden;
 }
 
 .results-header-sheet {
   background: transparent;
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .results-row-hint {
@@ -813,14 +813,14 @@ onBeforeUnmount(() => {
 .results-summary-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .summary-card {
-  border: 1px solid rgb(20 29 36 / 12%);
-  border-radius: 14px;
-  padding: 10px 12px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 90%), rgb(250 249 246 / 82%));
+  border: 1px solid rgb(80 0 0 / 24%);
+  border-radius: 12px;
+  padding: 8px 10px;
+  background: linear-gradient(180deg, rgb(252 250 249 / 93%), rgb(244 240 238 / 88%));
 }
 
 .summary-label {
@@ -832,8 +832,8 @@ onBeforeUnmount(() => {
 }
 
 .summary-value {
-  margin: 6px 0 2px;
-  font-size: 1.4rem;
+  margin: 4px 0 2px;
+  font-size: 1.28rem;
   font-weight: 700;
   color: var(--text-primary);
 }
@@ -860,7 +860,7 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
@@ -877,20 +877,20 @@ onBeforeUnmount(() => {
 
 .results-export-btn {
   border-width: 2px;
-  min-width: 132px;
+  min-width: 126px;
 }
 
 .results-clear-btn {
-  min-height: 40px;
+  min-height: 36px;
 }
 
 .result-details-panel {
   position: fixed;
   z-index: 1250;
   border: 1px solid rgb(14 27 36 / 24%);
-  border-radius: 16px;
-  padding: 12px 14px;
-  background: rgb(247 248 249 / 97%);
+  border-radius: 14px;
+  padding: 10px 12px;
+  background: rgb(250 246 244 / 95%);
   box-shadow: 0 18px 36px rgb(10 13 16 / 25%);
   display: flex;
   flex-direction: column;
@@ -930,8 +930,8 @@ onBeforeUnmount(() => {
 }
 
 .result-details-close {
-  border: 1px solid rgb(14 27 36 / 12%);
-  background: rgb(255 255 255 / 88%);
+  border: 1px solid rgb(80 0 0 / 20%);
+  background: rgb(255 252 250 / 86%);
   color: #334155;
   width: 28px;
   height: 28px;
@@ -1005,9 +1005,9 @@ onBeforeUnmount(() => {
 
 .grade-bar-track {
   min-height: 30px;
-  border: 1px solid rgb(20 29 36 / 14%);
+  border: 1px solid rgb(80 0 0 / 18%);
   border-radius: 6px;
-  background: rgb(251 252 253 / 92%);
+  background: rgb(250 246 245 / 92%);
   overflow: hidden;
 }
 
@@ -1050,25 +1050,25 @@ onBeforeUnmount(() => {
 
 :deep(.p-datatable-tbody > tr > td) {
   border: none;
-  border-bottom: 1px solid rgb(20 29 36 / 8%);
+  border-bottom: 1px solid rgb(80 0 0 / 12%);
   text-align: center;
-  padding: 14px 12px;
-  background: rgb(255 255 255 / 92%);
+  padding: 11px 10px;
+  background: rgb(252 250 249 / 93%);
 }
 
 :deep(.p-datatable-tbody > tr:hover > td) {
-  background: rgb(245 249 247 / 95%);
+  background: rgb(246 238 235 / 95%);
 }
 
 :deep(.p-datatable-tbody > tr.honors > td) {
-  background: linear-gradient(120deg, #8f7c3a, #705f2f);
+  background: linear-gradient(120deg, #9f7d22, #7b5f19);
   color: #fff;
 }
 
 :deep(.p-paginator) {
   border: none;
-  background: transparent;
-  padding-top: 12px;
+  background: rgb(247 241 239 / 75%);
+  padding-top: 10px;
 }
 
 :deep(.v-field) {

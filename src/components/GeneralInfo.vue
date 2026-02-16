@@ -23,13 +23,13 @@ const termRangeText = computed(() => {
 
 <template>
   <v-row no-gutters v-if="show" class="info-shell">
-    <v-col cols="12" class="px-4 px-sm-6 pt-5">
+    <v-col cols="12" class="px-4 px-sm-5 pt-4">
       <p class="info-kicker">How to use this</p>
       <h3 class="info-title">Fast grade-distribution context for better registration choices.</h3>
       <p class="info-range">{{ termRangeText }}</p>
     </v-col>
 
-    <v-col cols="12" md="7" class="px-4 px-sm-6 py-3">
+    <v-col cols="12" md="7" class="px-4 px-sm-5 py-2">
       <div class="info-panel">
         <h4>What this app helps with</h4>
         <ul>
@@ -40,7 +40,7 @@ const termRangeText = computed(() => {
       </div>
     </v-col>
 
-    <v-col cols="12" md="5" class="px-4 px-sm-6 py-3">
+    <v-col cols="12" md="5" class="px-4 px-sm-5 py-2">
       <div class="info-panel">
         <h4>Acknowledgements</h4>
         <ul class="credits-list">
@@ -52,7 +52,7 @@ const termRangeText = computed(() => {
       </div>
     </v-col>
 
-    <v-col cols="12" class="px-4 px-sm-6 pb-6 pt-2">
+    <v-col cols="12" class="px-4 px-sm-5 pb-4 pt-1">
       <a href="https://github.com/jippylong12/TAMU_FGD" target="_blank" rel="noopener noreferrer" class="repo-link">
         View the open-source pipeline
       </a>
@@ -75,7 +75,7 @@ const termRangeText = computed(() => {
 }
 
 .info-title {
-  margin: 10px 0 8px;
+  margin: 8px 0 6px;
   font-family: var(--font-display);
   font-size: clamp(1.22rem, 2vw, 1.7rem);
   line-height: 1.2;
@@ -90,10 +90,10 @@ const termRangeText = computed(() => {
 
 .info-panel {
   height: 100%;
-  border: 1px solid rgb(27 33 42 / 10%);
-  border-radius: 16px;
-  padding: 16px 18px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 80%), rgb(250 249 246 / 72%));
+  border: 1px solid rgb(80 0 0 / 26%);
+  border-radius: 12px;
+  padding: 12px 14px;
+  background: linear-gradient(180deg, rgb(252 248 246 / 88%), rgb(245 239 236 / 80%));
 }
 
 .info-panel h4 {

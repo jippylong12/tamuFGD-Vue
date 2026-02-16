@@ -28,6 +28,22 @@ import * as directives from 'vuetify/directives'
 const vuetify = createVuetify({
     components: {VCol, VRow, VApp, VContainer, VTextField, VSelect, VBtn, VChip, VCombobox, VDivider, VSpacer, VSwitch, VSheet},
     directives,
+    theme: {
+        defaultTheme: 'tamu',
+        themes: {
+            tamu: {
+                dark: false,
+                colors: {
+                    primary: '#500000',
+                    secondary: '#7a1f2b',
+                    info: '#7a1f2b',
+                    success: '#2f7d5b',
+                    warning: '#a56b1f',
+                    error: '#9b1c1c',
+                },
+            },
+        },
+    },
 })
 
 const app = createApp(App).use(vuetify).use(PrimeVue)

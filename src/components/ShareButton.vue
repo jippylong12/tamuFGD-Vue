@@ -65,7 +65,7 @@ async function showToast() {
     position: "center",
     stopOnFocus: false,
     style: {
-      background: '#17342d'
+      background: '#500000'
     },
     className: "info",
   }).showToast();
@@ -98,7 +98,7 @@ async function showToast() {
   align-items: center;
   gap: 8px;
   border: 1px solid rgb(255 255 255 / 26%);
-  background: linear-gradient(120deg, #17342d, #672a35);
+  background: linear-gradient(120deg, #500000, #6f1b2b);
   color: #fff;
   padding: 11px 16px;
   border-radius: 999px;

@@ -190,11 +190,8 @@ export default {
 <template>
   <v-app>
     <div class="app-shell">
-      <div class="app-ambient app-ambient-a"></div>
-      <div class="app-ambient app-ambient-b"></div>
-      <v-container :fluid=true class="app-container pa-2 pa-sm-4">
+      <v-container :fluid=true class="app-container pa-2 pa-sm-3">
         <header class="hero-card">
-          <p class="hero-kicker">Texas A&amp;M Course Planner</p>
           <h1 class="hero-title">TAMU Free Grade Distribution</h1>
           <p class="hero-copy">
             Search historical professor outcomes fast, compare sections, and decide with signal instead of guesswork.
@@ -283,7 +280,7 @@ export default {
 .app-shell {
   position: relative;
   min-height: 100vh;
-  padding-bottom: 20px;
+  padding-bottom: 14px;
   overflow: hidden;
 }
 
@@ -293,50 +290,14 @@ export default {
   max-width: 1280px;
 }
 
-.app-ambient {
-  position: fixed;
-  z-index: 0;
-  pointer-events: none;
-  border-radius: 999px;
-  filter: blur(2px);
-  opacity: 0.5;
-}
-
-.app-ambient-a {
-  width: 380px;
-  height: 380px;
-  background: radial-gradient(circle at 30% 30%, rgb(130 173 142 / 70%), rgb(130 173 142 / 5%));
-  top: -90px;
-  left: -110px;
-  animation: drift-a 18s ease-in-out infinite alternate;
-}
-
-.app-ambient-b {
-  width: 340px;
-  height: 340px;
-  background: radial-gradient(circle at 70% 70%, rgb(133 43 52 / 45%), rgb(133 43 52 / 3%));
-  bottom: -100px;
-  right: -70px;
-  animation: drift-b 15s ease-in-out infinite alternate;
-}
-
 .hero-card {
-  margin: 4px 0 18px;
-  border: 1px solid var(--surface-border);
-  border-radius: 24px;
-  background: linear-gradient(120deg, rgb(18 30 28 / 90%), rgb(66 19 30 / 88%));
+  margin: 2px 0 12px;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 18px;
+  background: linear-gradient(130deg, rgb(80 0 0 / 94%), rgb(103 20 33 / 92%));
   color: #f6f6f6;
-  padding: clamp(18px, 4vw, 32px);
-  box-shadow: 0 30px 60px rgb(10 13 16 / 22%);
-}
-
-.hero-kicker {
-  margin: 0 0 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  font-size: 0.74rem;
-  color: rgb(237 209 125 / 88%);
+  padding: clamp(16px, 3.4vw, 24px);
+  box-shadow: 0 22px 40px rgb(26 6 12 / 30%);
 }
 
 .hero-title {
@@ -347,9 +308,9 @@ export default {
 }
 
 .hero-copy {
-  margin: 14px 0 16px;
+  margin: 10px 0 12px;
   max-width: 760px;
-  color: rgb(244 245 247 / 88%);
+  color: rgb(248 233 236 / 92%);
   font-size: clamp(0.98rem, 1.4vw, 1.12rem);
   line-height: 1.5;
 }
@@ -357,44 +318,44 @@ export default {
 .hero-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .hero-pill {
   display: inline-flex;
   border: 1px solid rgb(255 255 255 / 24%);
   border-radius: 999px;
-  padding: 7px 12px;
+  padding: 6px 10px;
   background: rgb(255 255 255 / 11%);
-  font-size: 0.82rem;
+  font-size: 0.79rem;
 }
 
 .surface-card {
   border: 1px solid var(--surface-border);
-  border-radius: 24px;
+  border-radius: 18px;
   background: var(--surface-bg);
   box-shadow: var(--surface-shadow);
 }
 
 .form-surface {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .info-surface {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   overflow: hidden;
 }
 
 .no-results-surface {
-  margin-bottom: 16px;
-  padding: 20px;
+  margin-bottom: 12px;
+  padding: 14px;
 }
 
 .no-results-inner {
-  border: 1px dashed rgb(20 29 36 / 24%);
-  border-radius: 16px;
-  padding: 16px 18px;
-  background: rgb(255 255 255 / 70%);
+  border: 1px dashed rgb(80 0 0 / 46%);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: rgb(252 249 247 / 82%);
 }
 
 .no-results-kicker {
@@ -426,16 +387,16 @@ export default {
 }
 
 .results-surface {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   overflow: hidden;
 }
 
 .app-footer {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   justify-items: center;
   text-align: center;
-  margin-top: 2px;
+  margin-top: 0;
 }
 
 .creator-cta a {
@@ -449,36 +410,18 @@ export default {
   text-decoration: underline;
 }
 
-@keyframes drift-a {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(42px, 12px, 0);
-  }
-}
-
-@keyframes drift-b {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-28px, -16px, 0);
-  }
-}
-
 @media (max-width: 760px) {
   .hero-card {
-    border-radius: 20px;
+    border-radius: 16px;
     margin-top: 0;
   }
 
   .surface-card {
-    border-radius: 20px;
+    border-radius: 16px;
   }
 
   .no-results-surface {
-    padding: 14px;
+    padding: 10px;
   }
 }
 </style>
