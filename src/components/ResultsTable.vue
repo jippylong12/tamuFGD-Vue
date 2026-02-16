@@ -739,8 +739,13 @@ onBeforeUnmount(() => {
           :style="header === 'Professor' ? 'min-width: 14rem' : ''"
         >
           <template v-if="header === 'Professor'" #body="{ field, data }">
-            <div :class="data['honors'] === true ? 'shimmer' : null">
-              {{ data[field] }}
+            <div class="professor-cell">
+              <span class="professor-name">{{ data[field] }}</span>
+              <span class="honors-pill"
+                    :class="{ 'honors-pill-hidden': data['honors'] !== true }"
+                    :aria-hidden="data['honors'] !== true">
+                Honors
+              </span>
             </div>
           </template>
         </Column>
@@ -1061,8 +1066,12 @@ onBeforeUnmount(() => {
 }
 
 :deep(.p-datatable-tbody > tr.honors > td) {
-  background: linear-gradient(120deg, #9f7d22, #7b5f19);
-  color: #fff;
+  background: linear-gradient(120deg, rgb(252 243 215 / 96%), rgb(243 227 179 / 95%));
+  color: #3a2600;
+}
+
+:deep(.p-datatable-tbody > tr.honors:hover > td) {
+  background: linear-gradient(120deg, rgb(247 233 191 / 96%), rgb(237 216 154 / 95%));
 }
 
 :deep(.p-paginator) {
@@ -1074,6 +1083,43 @@ onBeforeUnmount(() => {
 :deep(.v-field) {
   border-radius: 12px;
   background: rgb(255 255 255 / 92%);
+}
+
+.professor-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.professor-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.honors-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  background: rgb(80 0 0 / 92%);
+  color: #fff;
+  line-height: 1.4;
+  margin-left: auto;
+  flex: 0 0 64px;
+}
+
+.honors-pill-hidden {
+  visibility: hidden;
 }
 
 @media (max-width: 1090px) {
