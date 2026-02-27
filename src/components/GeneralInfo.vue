@@ -22,7 +22,7 @@ const termRangeText = computed(() => {
 </script>
 
 <template>
-  <v-row no-gutters v-if="show" class="info-shell">
+  <v-row no-gutters v-if="show" class="info-shell" data-ga-section="default_info">
     <v-col cols="12" class="px-4 px-sm-5 pt-4">
       <p class="info-kicker">How to use this</p>
       <h3 class="info-title">Fast grade-distribution context for better registration choices.</h3>
@@ -53,7 +53,15 @@ const termRangeText = computed(() => {
     </v-col>
 
     <v-col cols="12" class="px-4 px-sm-5 pb-4 pt-1">
-      <a href="https://github.com/jippylong12/TAMU_FGD" target="_blank" rel="noopener noreferrer" class="repo-link">
+      <a
+        href="https://github.com/jippylong12/TAMU_FGD"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="repo-link"
+        data-ga-kind="external"
+        data-ga-item="open_source_pipeline"
+        data-ga-label="View the open-source pipeline"
+      >
         View the open-source pipeline
       </a>
     </v-col>

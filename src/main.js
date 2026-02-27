@@ -21,6 +21,7 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Paginator from "primevue/paginator";
 import InputText from "primevue/inputtext";
+import {initializeAnalyticsTracking} from '@/utils/analytics.js'
 import "primevue/resources/themes/lara-light-teal/theme.css";
 import "toastify-js/src/toastify.css"
 import * as directives from 'vuetify/directives'
@@ -51,4 +52,5 @@ app.component('DataTable', DataTable);
 app.component('Column', Column);
 app.component('Paginator', Paginator);
 app.component('InputText', InputText);
+initializeAnalyticsTracking();
 app.mount('#app')

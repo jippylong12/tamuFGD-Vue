@@ -135,8 +135,15 @@ function getMailtoUrl() {
 </script>
 
 <template>
-  <div v-if="show" class="report-issue-link">
-    <a :href="getMailtoUrl()" class="feedback-link" rel="noopener noreferrer">
+  <div v-if="show" class="report-issue-link" data-ga-section="footer_feedback">
+    <a
+      :href="getMailtoUrl()"
+      class="feedback-link"
+      rel="noopener noreferrer"
+      data-ga-kind="mailto"
+      data-ga-item="issue_report"
+      :data-ga-label="isResultsContext ? 'Report an issue with this result set' : 'Report an issue'"
+    >
       {{ isResultsContext ? 'Report an issue with this result set' : 'Report an issue' }}
     </a>
   </div>

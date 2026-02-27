@@ -1,5 +1,6 @@
 <script setup>
 import {ref, watch} from 'vue';
+import {trackEvent} from '@/utils/analytics.js';
 
 const props = defineProps({
   course: {
@@ -70,16 +71,22 @@ watch(() => props.courseNumber, (nextValue) => {
   }
 });
 
-function gtag() {
-  dataLayer.push(arguments);
-}
-
 function onClickCourse() {
-  gtag('event', 'clicked_course');
+  trackEvent('clicked_course');
+  trackEvent('portfolio_ui_interaction', {
+    action: 'focus_course_field',
+    section: 'search_form',
+    field_id: 'course',
+  });
 }
 
 function onClickCourseNumber() {
-  gtag('event', 'clicked_course_number');
+  trackEvent('clicked_course_number');
+  trackEvent('portfolio_ui_interaction', {
+    action: 'focus_course_number_field',
+    section: 'search_form',
+    field_id: 'course_number',
+  });
 }
 
 function updateCourseValue(value) {
@@ -106,8 +113,14 @@ function updateCourseNumberValue(value) {
 }
 
 function onChangeSortBy(val) {
-  gtag('event', 'clicked_sort_by');
   const nextSortBy = props.sortByOptions.find((a) => a.value === val);
+  trackEvent('clicked_sort_by');
+  trackEvent('portfolio_ui_interaction', {
+    action: 'change_sort_by',
+    section: 'search_form',
+    sort_id: String(val || ''),
+    sort_label: nextSortBy && nextSortBy.title ? nextSortBy.title : '',
+  });
   emits('update:sortByValue', nextSortBy);
 }
 
@@ -129,7 +142,7 @@ function onCourseNumberBlur() {
 </script>
 
 <template>
-  <v-row no-gutters class="form-shell">
+  <v-row no-gutters class="form-shell" data-ga-section="search_form">
     <v-col cols="12" class="form-intro px-4 px-sm-5 pt-4 pt-sm-5">
       <p class="form-kicker">Search</p>
       <h2 class="form-title">Build your schedule with cleaner data.</h2>
@@ -140,7 +153,7 @@ function onCourseNumberBlur() {
     </v-col>
 
     <v-col cols="12" class="px-4 px-sm-5 pt-3 pt-sm-4 pb-4 pb-sm-5">
-      <form class="form-submit" @submit.prevent="$emit('submitBtnClick')">
+      <form class="form-submit" data-ga-item="course_search_form" @submit.prevent="$emit('submitBtnClick')">
       <v-row class="form-grid" no-gutters>
         <v-col cols="12" sm="6" class="field-col pr-sm-2 pb-2">
           <v-combobox

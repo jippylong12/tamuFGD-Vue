@@ -191,7 +191,7 @@ export default {
   <v-app>
     <div class="app-shell">
       <v-container :fluid=true class="app-container pa-2 pa-sm-3">
-        <header class="hero-card">
+        <header class="hero-card" data-ga-section="hero">
           <h1 class="hero-title">TAMU Free Grade Distribution</h1>
           <p class="hero-copy">
             Search historical professor outcomes fast, compare sections, and decide with signal instead of guesswork.
@@ -203,7 +203,7 @@ export default {
           </div>
         </header>
 
-        <section class="surface-card form-surface">
+        <section class="surface-card form-surface" data-ga-section="search_form">
           <MainForm :course="course"
                     :course-number="courseNumber"
                     :sort-by-value="sortByValue"
@@ -218,12 +218,12 @@ export default {
                     @submit-btn-click="onSubmit"/>
         </section>
 
-        <section v-if="isDefaultView" class="surface-card info-surface">
+        <section v-if="isDefaultView" class="surface-card info-surface" data-ga-section="default_info">
           <GeneralInfo :show="isDefaultView"
                        :dataset-metadata="datasetMetadata"/>
         </section>
 
-        <section v-if="isNoResultsView" class="surface-card no-results-surface">
+        <section v-if="isNoResultsView" class="surface-card no-results-surface" data-ga-section="no_results">
           <div class="no-results-inner">
             <p class="no-results-kicker">No matches found</p>
             <h2>Try a broader search for {{ activeQueryLabel || 'that course' }}.</h2>
@@ -238,7 +238,7 @@ export default {
           </div>
         </section>
 
-        <section v-if="hasResultsContext" class="surface-card results-surface">
+        <section v-if="hasResultsContext" class="surface-card results-surface" data-ga-section="results_table">
           <ResultsTable v-bind="{
             tableData,
             dataLoading,
@@ -248,9 +248,16 @@ export default {
                         @filter-state-changed="onResultsTableFilterChange"/>
         </section>
 
-        <footer class="app-footer">
+        <footer class="app-footer" data-ga-section="footer">
           <div v-if="hasSearched" class="creator-cta">
-            <a href="https://www.jippylong12.xyz" target="_blank" rel="noopener noreferrer">
+            <a
+              href="https://www.jippylong12.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              data-ga-kind="external"
+              data-ga-item="portfolio_homepage"
+              data-ga-label="Built by Marcus Salinas"
+            >
               Built by Marcus Salinas
             </a>
           </div>

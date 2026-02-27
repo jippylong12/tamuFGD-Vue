@@ -1,5 +1,6 @@
 import {computed, ref, watch} from 'vue'
 import Toastify from 'toastify-js'
+import {trackEvent} from '@/utils/analytics.js';
 
 export function useResultsQuery(axios) {
   const cacheNamespace = 'fgd-query-cache';
@@ -36,14 +37,6 @@ export function useResultsQuery(axios) {
 
     return `Last updated: ${parsed.toLocaleString()}`;
   });
-
-  window.dataLayer = window.dataLayer || [];
-  function gtag() {
-    dataLayer.push(arguments);
-  }
-
-  gtag('js', new Date());
-  gtag('config', 'G-B24WEF5K6V');
 
   function showToast(message) {
     Toastify({
@@ -381,6 +374,11 @@ export function useResultsQuery(axios) {
 
     const isValid = runClientValidation();
     if (!isValid) {
+      trackEvent('portfolio_ui_interaction', {
+        action: 'submit_validation_failed',
+        section: 'search_form',
+        error_count: Object.keys(validationErrors.value || {}).length,
+      });
       return;
     }
 
@@ -390,6 +388,12 @@ export function useResultsQuery(axios) {
     const cachedPayload = loadQueryCache(cacheKey);
     if (cachedPayload) {
       applyResultPayload(cachedPayload);
+      trackEvent('portfolio_ui_interaction', {
+        action: 'submit_cache_hit',
+        section: 'search_form',
+        query_id: `${course.value.trim().toUpperCase()}-${courseNumber.value.trim()}`,
+        result_count: Array.isArray(cachedPayload.tableData) ? cachedPayload.tableData.length : 0,
+      });
       dataLoading.value = false;
       return;
     }
@@ -398,10 +402,16 @@ export function useResultsQuery(axios) {
     serverMessage.value = '';
     validationErrors.value = {};
 
-    gtag('event', 'clicked_submit_btn', {
+    trackEvent('clicked_submit_btn', {
       course: course.value,
       course_number: courseNumber.value,
       sort_by: sortByValue.value['title'],
+    });
+    trackEvent('portfolio_ui_interaction', {
+      action: 'submit_search',
+      section: 'search_form',
+      query_id: `${course.value.trim().toUpperCase()}-${courseNumber.value.trim()}`,
+      sort_id: sortByValue.value['value'],
     });
 
     makePostRequest().then((payload) => {
@@ -415,6 +425,12 @@ export function useResultsQuery(axios) {
       }
 
       applyResultPayload(payload);
+      trackEvent('portfolio_ui_interaction', {
+        action: 'submit_results_loaded',
+        section: 'search_form',
+        query_id: `${course.value.trim().toUpperCase()}-${courseNumber.value.trim()}`,
+        result_count: Array.isArray(payload.tableData) ? payload.tableData.length : 0,
+      });
       if (shouldCachePayload(payload)) {
         cacheQueryResult(cacheKey, payload);
       }
@@ -444,6 +460,12 @@ export function useResultsQuery(axios) {
       if (serverMessage.value) {
         showToast(serverMessage.value);
       }
+
+      trackEvent('portfolio_ui_interaction', {
+        action: 'submit_error',
+        section: 'search_form',
+        query_id: `${course.value.trim().toUpperCase()}-${courseNumber.value.trim()}`,
+      });
     });
   }
 

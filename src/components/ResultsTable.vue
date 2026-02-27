@@ -1,6 +1,7 @@
 <script setup>
 import {FilterMatchMode, FilterOperator} from "primevue/api";
 import {computed, onBeforeUnmount, onMounted, ref, watch} from "vue";
+import {trackEvent} from '@/utils/analytics.js';
 
 const props = defineProps({
   tableData: {
@@ -211,6 +212,13 @@ function exportFilteredRowsCsv() {
   if (!canExportFilteredRows.value) {
     return;
   }
+
+  trackEvent('portfolio_ui_interaction', {
+    action: 'export_csv',
+    section: 'results_table',
+    visible_results_count: filteredRows.value.length,
+    total_results_count: totalRows.value,
+  });
 
   const csvContent = buildExportCsvContent(filteredRows.value, props.tableHeaders);
   const blob = new Blob([`\uFEFF${csvContent}`], {type: 'text/csv;charset=utf-8;'});
@@ -423,6 +431,10 @@ function beginPanelResize(event) {
 }
 
 function closeDetailsPanel() {
+  trackEvent('portfolio_ui_interaction', {
+    action: 'close_professor_details',
+    section: 'results_table',
+  });
   selectedRow.value = null;
 }
 
@@ -536,6 +548,11 @@ function syncFilteredRowsFromTransformedData() {
 }
 
 function clearAllTableFilters() {
+  trackEvent('portfolio_ui_interaction', {
+    action: 'clear_filters',
+    section: 'results_table',
+    previous_active_filters_count: activeFiltersCount.value,
+  });
   filters.value.global.value = null;
   filters.value['Professor'].value = null;
   filters.value['GPA'].constraints[0].value = null;
@@ -556,6 +573,17 @@ watch(
 );
 watch(transformedData, syncFilteredRowsFromTransformedData, {immediate: true});
 watch(filters, emitFilterState, {deep: true});
+watch(selectedRow, (nextRow, previousRow) => {
+  if (!nextRow || nextRow === previousRow) {
+    return;
+  }
+
+  trackEvent('portfolio_ui_interaction', {
+    action: 'open_professor_details',
+    section: 'results_table',
+    professor_id: nextRow['Professor'] || 'unknown',
+  });
+});
 applyInitialFilterState(props.initialFilterState);
 
 onMounted(() => {
@@ -575,7 +603,12 @@ onBeforeUnmount(() => {
 
 </script>
 <template>
-  <v-row v-if="transformedData.length > 0 || dataLoading" class="results-shell px-3 px-sm-4 pb-4">
+  <v-row
+    v-if="transformedData.length > 0 || dataLoading"
+    class="results-shell px-3 px-sm-4 pb-4"
+    data-ga-section="results_table"
+    data-ga-item="results_datatable"
+  >
     <v-col cols="12" class="pt-3">
       <DataTable
         class="results-table"

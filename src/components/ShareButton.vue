@@ -1,5 +1,6 @@
 <script setup>
 import Toastify from "toastify-js";
+import {trackEvent} from '@/utils/analytics.js';
 
 const props = defineProps(['show', 'course', 'courseNumber', 'sortByValue', 'filterState'])
 defineEmits(['click'])
@@ -63,6 +64,11 @@ function buildShareUrl() {
 async function pressedCopyButton() {
   showToast()
   const currentUrl = buildShareUrl();
+  trackEvent('portfolio_ui_interaction', {
+    action: 'copy_share_view',
+    section: 'share_button',
+    query_id: `${props.course || ''}-${props.courseNumber || ''}`,
+  });
   await navigator.clipboard.writeText(currentUrl);
 }
 
@@ -82,8 +88,8 @@ async function showToast() {
 
 </script>
 <template>
-  <div v-if="show" class="share-button-shell" @click="pressedCopyButton">
-    <button class="copy-url-button">
+  <div v-if="show" class="share-button-shell" data-ga-section="share_button" @click="pressedCopyButton">
+    <button class="copy-url-button" data-ga-item="share_view_button" data-ga-label="Share View">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
            fill="currentColor" class="bi bi-share" viewBox="0 0 16 16">
         <path
